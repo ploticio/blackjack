@@ -9,6 +9,7 @@ export default function CardComponent({ card }: IProps) {
     <>
       <div>
         <img src={card.image} />
+        <h2>{card.value}</h2>
       </div>
     </>
   );

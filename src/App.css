@@ -3,3 +3,9 @@
   padding: 2rem;
   text-align: center;
 }
+
+.hand {
+  display: flex;
+  padding: 2rem;
+  justify-content: space-between;
+}

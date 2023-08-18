@@ -3,10 +3,16 @@ import CardComponent from "./components/CardComponent";
 import { deck } from "./utilities/cards";
 
 function App() {
-  const myCard = deck[0];
   return (
     <div className="App">
-      <CardComponent card={myCard} />
+      <div className="hand">
+        <CardComponent card={deck[0]} />
+        <CardComponent card={deck[10]} />
+      </div>
+      <div className="hand">
+        <CardComponent card={deck[1]} />
+        <CardComponent card={deck[2]} />
+      </div>
     </div>
   );
 }
