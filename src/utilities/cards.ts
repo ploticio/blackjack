@@ -54,6 +54,9 @@ import jack_of_hearts from "../assets/cards/jack_of_hearts.svg";
 import queen_of_hearts from "../assets/cards/queen_of_hearts.svg";
 import king_of_hearts from "../assets/cards/king_of_hearts.svg";
 
+// import card_back from "../assets/cards/card_back.svg";
+export { default as card_back } from "../assets/cards/card_back.svg";
+
 enum Suit {
   Club,
   Spade,
@@ -66,6 +69,8 @@ export interface Card {
   suit: Suit;
   image: string;
 }
+
+// export const back_card: Card = { value: 0, suit: Suit.Club, image: card_back };
 
 export const deck: Card[] = [
   { value: 1, suit: Suit.Club, image: ace_of_clubs },

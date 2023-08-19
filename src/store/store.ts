@@ -6,13 +6,20 @@ interface IState {
   shoe: Card[];
   playerHand: Card[];
   dealerHand: Card[];
-  discardPile: Card[];
+  discarded: Card[];
   bank: number;
   tempCard: Card;
+  startScreen: boolean;
+  holeCardImg: string;
 
   shuffle: () => void;
   sample: () => Card;
   addToPlayer: (newCard: Card) => void;
+  addToDealer: (newCard: Card) => void;
+  resetHands: () => void;
+  startGame: () => void;
+  setHoleImg: (img: string) => void;
+  flipCard: () => void;
 }
 
 export const useStore = create<IState>()(
@@ -20,9 +27,11 @@ export const useStore = create<IState>()(
     shoe: [...deck],
     playerHand: [],
     dealerHand: [],
-    discardPile: [],
+    discarded: [],
     bank: 1000,
     tempCard: {} as Card,
+    startScreen: true,
+    holeCardImg: "",
 
     shuffle: () => {
       console.log("shuffle running");
@@ -50,6 +59,40 @@ export const useStore = create<IState>()(
       console.log("adding to player hand");
       set((state) => {
         state.playerHand.push(newCard);
+      });
+    },
+
+    addToDealer: (newCard) => {
+      console.log("adding to dealer hand");
+      set((state) => {
+        state.dealerHand.push(newCard);
+      });
+    },
+
+    resetHands: () => {
+      console.log("reseting hands");
+      set((state) => {
+        state.discarded = [...state.discarded, ...state.playerHand, ...state.dealerHand];
+        state.playerHand = [];
+        state.dealerHand = [];
+      });
+    },
+
+    startGame: () => {
+      set((state) => {
+        state.startScreen = false;
+      });
+    },
+
+    setHoleImg: (img) => {
+      set((state) => {
+        state.holeCardImg = img;
+      });
+    },
+
+    flipCard: () => {
+      set((state) => {
+        state.dealerHand[state.dealerHand.length - 1].image = state.holeCardImg;
       });
     },
   }))
