@@ -58,10 +58,10 @@ import king_of_hearts from "../assets/cards/king_of_hearts.svg";
 export { default as card_back } from "../assets/cards/card_back.svg";
 
 enum Suit {
-  Club,
-  Spade,
-  Heart,
-  Diamond,
+  Club = "club",
+  Spade = "spade",
+  Heart = "heart",
+  Diamond = "diamond",
 }
 
 export interface Card {

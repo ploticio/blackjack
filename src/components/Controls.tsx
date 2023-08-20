@@ -1,52 +1,49 @@
 import { useEffect } from "react";
-import { useStore } from "../store/store";
+import { useStore, Status } from "../store/store";
 import { card_back } from "../utilities/cards";
 
-export default function ControlsComponent() {
+export default function Controls() {
   const resetHands = useStore((state) => state.resetHands);
   const playerHand = useStore((state) => state.playerHand);
-  const dealerHand = useStore((state) => state.dealerHand);
   const playerStanding = useStore((state) => state.playerStanding);
-  const playerBust = useStore((state) => state.playerBust);
-  const dealerBust = useStore((state) => state.dealerBust);
+  const playerSum = useStore((state) => state.getPlayerSum);
   const dealerSum = useStore((state) => state.getDealerSum);
+  const status = useStore((state) => state.status);
 
   const flipCard = useStore((state) => state.flipCard);
   const sample = useStore((state) => state.sample);
   const addToDealer = useStore((state) => state.addToDealer);
 
   const addToPlayer = useStore((state) => state.addToPlayer);
-  const setPlayerBust = useStore((state) => state.setPlayerBust);
-  const setDealerBust = useStore((state) => state.setDealerBust);
   const setPlayerStanding = useStore((state) => state.setPlayerStanding);
   const setHoleImg = useStore((state) => state.setHoleImg);
+  const setStatus = useStore((state) => state.setStatus);
 
   // Check for player busting
   useEffect(() => {
-    const sum = playerHand.reduce((acc, card) => acc + card.value, 0);
-    if (sum > 21) {
-      setPlayerBust(true);
-    }
-  }, [playerHand, setPlayerBust]);
+    if (playerSum() > 21) setStatus(Status.Loss);
+  }, [playerHand, playerSum, setStatus]);
 
   // Handle Player busting
   useEffect(() => {
-    if (playerBust) {
+    if (status == Status.Loss) {
       flipCard();
     }
-  }, [playerBust, flipCard]);
+  }, [status, flipCard, setStatus]);
 
   // Handle Player standing
   useEffect(() => {
     if (playerStanding) {
       flipCard();
-      while (dealerSum() < 17) {
-        const newCard = sample();
-        addToDealer(newCard);
+      while (dealerSum() < 17) addToDealer(sample());
+      if (dealerSum() > 21) setStatus(Status.Win);
+      else {
+        if (playerSum() > dealerSum()) setStatus(Status.Win);
+        else if (playerSum() < dealerSum()) setStatus(Status.Loss);
+        else setStatus(Status.Push);
       }
-      if (dealerSum() > 21) setDealerBust(true);
     }
-  }, [playerStanding, flipCard, dealerSum, addToDealer, sample, setDealerBust]);
+  }, [playerStanding, flipCard, dealerSum, playerSum, addToDealer, sample, setStatus]);
 
   const handleNewRound = () => {
     resetHands();
@@ -59,11 +56,8 @@ export default function ControlsComponent() {
 
     addToPlayer(sample());
     addToPlayer(sample());
-
-    setPlayerBust(false);
-    setDealerBust(false);
     setPlayerStanding(false);
-    console.log(dealerSum);
+    setStatus(Status.Playing);
   };
 
   return (

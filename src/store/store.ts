@@ -2,6 +2,14 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { Card, deck } from "../utilities/cards";
 
+export enum Status {
+  Menu = "Menu",
+  Playing = "Playing",
+  Win = "Win!",
+  Loss = "Loss!",
+  Push = "Push!",
+}
+
 interface IState {
   shoe: Card[];
   playerHand: Card[];
@@ -9,29 +17,26 @@ interface IState {
   discarded: Card[];
   bank: number;
   tempCard: Card;
-  startScreen: boolean;
   holeCardImg: string;
-  playerBust: boolean;
-  dealerBust: boolean;
   playerStanding: boolean;
+  status: Status;
 
   shuffle: () => void;
   sample: () => Card;
   addToPlayer: (newCard: Card) => void;
   addToDealer: (newCard: Card) => void;
   resetHands: () => void;
-  startGame: () => void;
   setHoleImg: (img: string) => void;
   flipCard: () => void;
-  setPlayerBust: (value: boolean) => void;
-  setDealerBust: (value: boolean) => void;
   setPlayerStanding: (value: boolean) => void;
+  getPlayerSum: () => number;
   getDealerSum: () => number;
+  setStatus: (status: Status) => void;
 }
 
 export const useStore = create<IState>()(
   immer((set, get) => ({
-    shoe: [...deck],
+    shoe: [...deck, ...deck, ...deck, ...deck],
     playerHand: [],
     dealerHand: [],
     discarded: [],
@@ -39,13 +44,11 @@ export const useStore = create<IState>()(
     tempCard: {} as Card,
     startScreen: true,
     holeCardImg: "",
-    playerBust: false,
     dealerBust: false,
     playerStanding: false,
+    status: Status.Menu,
 
     shuffle: () => {
-      console.log("shuffle running");
-
       set((state) => {
         state.shoe = state.shoe
           .map((card) => ({ card, sort: Math.random() }))
@@ -55,8 +58,6 @@ export const useStore = create<IState>()(
     },
 
     sample: () => {
-      console.log("sample running");
-
       set((state) => {
         if (state.shoe.length) {
           state.tempCard = state.shoe.pop()!;
@@ -66,14 +67,12 @@ export const useStore = create<IState>()(
     },
 
     addToPlayer: (newCard) => {
-      console.log("adding to player hand");
       set((state) => {
         state.playerHand.push(newCard);
       });
     },
 
     addToDealer: (newCard) => {
-      console.log("adding to dealer hand");
       set((state) => {
         state.dealerHand.push(newCard);
       });
@@ -88,12 +87,6 @@ export const useStore = create<IState>()(
       });
     },
 
-    startGame: () => {
-      set((state) => {
-        state.startScreen = false;
-      });
-    },
-
     setHoleImg: (img) => {
       set((state) => {
         state.holeCardImg = img;
@@ -101,23 +94,8 @@ export const useStore = create<IState>()(
     },
 
     flipCard: () => {
-      console.log("flipping card");
       set((state) => {
         state.dealerHand[state.dealerHand.length - 1].image = state.holeCardImg;
-      });
-    },
-
-    setPlayerBust: (value) => {
-      console.log(`Player Bust: ${value}`);
-      set((state) => {
-        state.playerBust = value;
-      });
-    },
-
-    setDealerBust: (value) => {
-      console.log(`Dealer Bust: ${value}`);
-      set((state) => {
-        state.dealerBust = value;
       });
     },
 
@@ -128,8 +106,19 @@ export const useStore = create<IState>()(
       });
     },
 
+    getPlayerSum: () => {
+      return get().playerHand.reduce((acc, card) => acc + card.value, 0);
+    },
+
     getDealerSum: () => {
       return get().dealerHand.reduce((acc, card) => acc + card.value, 0);
+    },
+
+    setStatus: (status) => {
+      console.log(`Setting status: ${status}`);
+      set((state) => {
+        state.status = status;
+      });
     },
   }))
 );

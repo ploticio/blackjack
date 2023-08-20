@@ -1,8 +1,8 @@
-import { useStore } from "../store/store";
+import { useStore, Status } from "../store/store";
 import { card_back } from "../utilities/cards";
 
 export default function StartMenu() {
-  const startGame = useStore((state) => state.startGame);
+  const setStatus = useStore((state) => state.setStatus);
   const shuffle = useStore((state) => state.shuffle);
   const sample = useStore((state) => state.sample);
   const addToDealer = useStore((state) => state.addToDealer);
@@ -10,7 +10,7 @@ export default function StartMenu() {
   const setHoleImg = useStore((state) => state.setHoleImg);
 
   const handleGameStart = () => {
-    startGame();
+    setStatus(Status.Playing);
 
     for (let i = 0; i < 10; i++) {
       shuffle();
