@@ -11,6 +11,9 @@ interface IState {
   tempCard: Card;
   startScreen: boolean;
   holeCardImg: string;
+  playerBust: boolean;
+  dealerBust: boolean;
+  playerStanding: boolean;
 
   shuffle: () => void;
   sample: () => Card;
@@ -20,6 +23,10 @@ interface IState {
   startGame: () => void;
   setHoleImg: (img: string) => void;
   flipCard: () => void;
+  setPlayerBust: (value: boolean) => void;
+  setDealerBust: (value: boolean) => void;
+  setPlayerStanding: (value: boolean) => void;
+  getDealerSum: () => number;
 }
 
 export const useStore = create<IState>()(
@@ -32,6 +39,9 @@ export const useStore = create<IState>()(
     tempCard: {} as Card,
     startScreen: true,
     holeCardImg: "",
+    playerBust: false,
+    dealerBust: false,
+    playerStanding: false,
 
     shuffle: () => {
       console.log("shuffle running");
@@ -91,9 +101,35 @@ export const useStore = create<IState>()(
     },
 
     flipCard: () => {
+      console.log("flipping card");
       set((state) => {
         state.dealerHand[state.dealerHand.length - 1].image = state.holeCardImg;
       });
+    },
+
+    setPlayerBust: (value) => {
+      console.log(`Player Bust: ${value}`);
+      set((state) => {
+        state.playerBust = value;
+      });
+    },
+
+    setDealerBust: (value) => {
+      console.log(`Dealer Bust: ${value}`);
+      set((state) => {
+        state.dealerBust = value;
+      });
+    },
+
+    setPlayerStanding: (value) => {
+      console.log(`Player is standing: ${value}`);
+      set((state) => {
+        state.playerStanding = value;
+      });
+    },
+
+    getDealerSum: () => {
+      return get().dealerHand.reduce((acc, card) => acc + card.value, 0);
     },
   }))
 );
