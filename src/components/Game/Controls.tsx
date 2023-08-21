@@ -58,7 +58,11 @@ export default function Controls() {
         } else setStatus(Status.Push);
       }
     }
-  }, [playerStanding, flipCard, dealerSum, playerSum, addToDealer, sample, setStatus]);
+  }, [playerStanding, flipCard, dealerSum, playerSum, addToDealer, sample, setStatus, printDealerCards]);
+
+  const handleHit = () => {
+    if (status === Status.Playing) addToPlayer(sample());
+  };
 
   const handleNewRound = () => {
     resetHands();
@@ -69,7 +73,7 @@ export default function Controls() {
 
   return (
     <>
-      <button onClick={() => addToPlayer(sample())}>Hit</button>
+      <button onClick={() => handleHit()}>Hit</button>
       <button onClick={() => setPlayerStanding(true)}>Stand</button>
       <button onClick={() => handleNewRound()}>Reset Hands</button>
     </>

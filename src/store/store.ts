@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { Card, back_card, deck } from "../utilities/cards";
+import { devtools } from "zustand/middleware";
 
 export enum Status {
   Menu = "Menu",
@@ -46,125 +47,129 @@ interface IState {
 }
 
 export const useStore = create<IState>()(
-  immer((set, get) => ({
-    shoe: [...deck, ...deck, ...deck, ...deck],
-    playerHand: [],
-    dealerHand: [],
-    discarded: [],
-    tempCard: {} as Card,
-    startScreen: true,
-    holeCardImg: "",
-    dealerBust: false,
-    playerStanding: false,
-    status: Status.Menu,
-    holeCard: {} as Card,
-    bank: 1000,
-    bet: 0,
+  immer(
+    devtools((set, get) => ({
+      shoe: [...deck, ...deck, ...deck, ...deck],
+      playerHand: [],
+      dealerHand: [],
+      discarded: [],
+      tempCard: {} as Card,
+      startScreen: true,
+      holeCardImg: "",
+      dealerBust: false,
+      playerStanding: false,
+      status: Status.Menu,
+      holeCard: {} as Card,
+      bank: 1000,
+      bet: 0,
 
-    shuffle: () => {
-      set((state) => {
-        state.shoe = state.shoe
-          .map((card) => ({ card, sort: Math.random() }))
-          .sort((a, b) => a.sort - b.sort)
-          .map(({ card }) => card);
-      });
-    },
+      shuffle: () => {
+        set((state) => {
+          state.shoe = state.shoe
+            .map((card) => ({ card, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ card }) => card);
+        });
+      },
 
-    sample: () => {
-      set((state) => {
-        if (state.shoe.length) {
-          state.tempCard = state.shoe.pop()!;
+      sample: () => {
+        set((state) => {
+          if (state.shoe.length) {
+            state.tempCard = state.shoe.pop()!;
+          }
+        });
+        return get().tempCard;
+      },
+
+      addToPlayer: (newCard) => {
+        set((state) => {
+          state.playerHand.push(newCard);
+        });
+      },
+
+      addToDealer: (newCard) => {
+        set((state) => {
+          state.dealerHand.push(newCard);
+        });
+      },
+
+      resetHands: () => {
+        set((state) => {
+          state.discarded = [...state.discarded, ...state.playerHand, ...state.dealerHand];
+          state.playerHand = [];
+          state.dealerHand = [];
+        });
+      },
+
+      flipCard: () => {
+        set((state) => {
+          state.dealerHand[state.dealerHand.length - 1] = state.holeCard;
+        });
+      },
+
+      setPlayerStanding: (value) => {
+        set((state) => {
+          state.playerStanding = value;
+        });
+      },
+
+      getPlayerSum: () => {
+        const hardTotal = get().playerHand.reduce((acc, card) => acc + card.value, 0);
+        let softTotal = hardTotal;
+        if (get().playerHand.some((card) => card.value === 1)) {
+          softTotal = hardTotal + 10;
         }
-      });
-      return get().tempCard;
-    },
+        return {
+          hardTotal,
+          softTotal,
+        };
+      },
 
-    addToPlayer: (newCard) => {
-      set((state) => {
-        state.playerHand.push(newCard);
-      });
-    },
+      getDealerSum: () => {
+        const hardTotal = get().dealerHand.reduce((acc, card) => acc + card.value, 0);
+        let softTotal = hardTotal;
+        if (get().dealerHand.some((card) => card.value === 1)) {
+          softTotal = hardTotal + 10;
+        }
+        return {
+          hardTotal,
+          softTotal,
+        };
+      },
 
-    addToDealer: (newCard) => {
-      set((state) => {
-        state.dealerHand.push(newCard);
-      });
-    },
+      setStatus: (status) => {
+        set((state) => {
+          state.status = status;
+        });
+      },
 
-    resetHands: () => {
-      set((state) => {
-        state.discarded = [...state.discarded, ...state.playerHand, ...state.dealerHand];
-        state.playerHand = [];
-        state.dealerHand = [];
-      });
-    },
+      addHoleCard: () => {
+        set((state) => {
+          if (state.shoe.length) {
+            state.holeCard = state.shoe.pop()!;
+          }
+          state.dealerHand.push({ ...back_card });
+        });
+      },
 
-    flipCard: () => {
-      set((state) => {
-        state.dealerHand[state.dealerHand.length - 1] = state.holeCard;
-      });
-    },
+      changeBet: (betAmount) => {
+        set((state) => {
+          state.bet += betAmount;
+        });
+      },
 
-    setPlayerStanding: (value) => {
-      set((state) => {
-        state.playerStanding = value;
-      });
-    },
+      getBet: () => get().bet,
 
-    getPlayerSum: () => {
-      const hardTotal = get().playerHand.reduce((acc, card) => acc + card.value, 0);
-      let softTotal = hardTotal;
-      if (get().playerHand.some((card) => card.value === 1)) {
-        softTotal = hardTotal + 10;
-      }
-      return {
-        hardTotal,
-        softTotal,
-      };
-    },
+      changeBank: (amount) => {
+        set((state) => {
+          state.bank += amount;
+        });
+      },
 
-    getDealerSum: () => {
-      const hardTotal = get().dealerHand.reduce((acc, card) => acc + card.value, 0);
-      let softTotal = hardTotal;
-      if (get().dealerHand.some((card) => card.value === 1)) {
-        softTotal = hardTotal + 10;
-      }
-      return {
-        hardTotal,
-        softTotal,
-      };
-    },
-
-    setStatus: (status) => {
-      set((state) => {
-        state.status = status;
-      });
-    },
-
-    addHoleCard: () => {
-      set((state) => {
-        state.holeCard = state.sample();
-        state.dealerHand.push({ ...back_card });
-      });
-    },
-
-    changeBet: (betAmount) => {
-      set((state) => {
-        state.bet += betAmount;
-      });
-    },
-
-    getBet: () => get().bet,
-
-    changeBank: (amount) => {
-      set((state) => {
-        state.bank += amount;
-      });
-    },
-
-    printDealerCards: () => {
-      const dealerArray = get().dealerHand.map((card) => card.value);
-      console.log(dealerArray);
-    },
-  }))
+      printDealerCards: () => {
+        const dealerArray = get().dealerHand.map((card) => card.value);
+        console.log(dealerArray);
+      },
+    }))
+  )
 );

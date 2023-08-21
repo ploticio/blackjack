@@ -2,7 +2,7 @@ import { Status, useStore } from "../../store/store";
 
 export default function BankControls() {
   const setStatus = useStore((state) => state.setStatus);
-  const shuffle = useStore((state) => state.shuffle);
+  // const shuffle = useStore((state) => state.shuffle);
   const sample = useStore((state) => state.sample);
   const addToDealer = useStore((state) => state.addToDealer);
   const addToPlayer = useStore((state) => state.addToPlayer);
@@ -17,13 +17,14 @@ export default function BankControls() {
     changeBank(-1 * bet);
 
     setStatus(Status.Playing);
-    for (let i = 0; i < 10; i++) {
-      shuffle();
-    }
+    // for (let i = 0; i < 10; i++) {
+    //   shuffle();
+    // }
+
+    addToPlayer(sample());
     addToDealer(sample());
+    addToPlayer(sample());
     addHoleCard();
-    addToPlayer(sample());
-    addToPlayer(sample());
   };
 
   const handleChangeBet = (amount: number) => {
