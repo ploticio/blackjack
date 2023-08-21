@@ -12,7 +12,6 @@ export default function HandComponent({ cards }: IProps) {
       <div className="hand">
         {cards.length > 0 && cards.map((card, index) => <CardComponent key={index} card={card} />)}
       </div>
-      <h2>Hand: {cards.reduce((acc, card) => acc + card.value, 0)}</h2>
     </>
   );
 }

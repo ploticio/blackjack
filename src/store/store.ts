@@ -10,6 +10,11 @@ export enum Status {
   Push = "Push!",
 }
 
+interface Sum {
+  hardTotal: number;
+  softTotal: number;
+}
+
 interface IState {
   shoe: Card[];
   playerHand: Card[];
@@ -29,8 +34,8 @@ interface IState {
   setHoleImg: (img: string) => void;
   flipCard: () => void;
   setPlayerStanding: (value: boolean) => void;
-  getPlayerSum: () => number;
-  getDealerSum: () => number;
+  getPlayerSum: () => Sum;
+  getDealerSum: () => Sum;
   setStatus: (status: Status) => void;
 }
 
@@ -79,7 +84,6 @@ export const useStore = create<IState>()(
     },
 
     resetHands: () => {
-      console.log("reseting hands");
       set((state) => {
         state.discarded = [...state.discarded, ...state.playerHand, ...state.dealerHand];
         state.playerHand = [];
@@ -100,22 +104,36 @@ export const useStore = create<IState>()(
     },
 
     setPlayerStanding: (value) => {
-      console.log(`Player is standing: ${value}`);
       set((state) => {
         state.playerStanding = value;
       });
     },
 
     getPlayerSum: () => {
-      return get().playerHand.reduce((acc, card) => acc + card.value, 0);
+      const hardTotal = get().playerHand.reduce((acc, card) => acc + card.value, 0);
+      let softTotal = hardTotal;
+      if (get().playerHand.some((card) => card.value === 1)) {
+        softTotal = hardTotal + 10;
+      }
+      return {
+        hardTotal,
+        softTotal,
+      };
     },
 
     getDealerSum: () => {
-      return get().dealerHand.reduce((acc, card) => acc + card.value, 0);
+      const hardTotal = get().dealerHand.reduce((acc, card) => acc + card.value, 0);
+      let softTotal = hardTotal;
+      if (get().dealerHand.some((card) => card.value === 1)) {
+        softTotal = hardTotal + 10;
+      }
+      return {
+        hardTotal,
+        softTotal,
+      };
     },
 
     setStatus: (status) => {
-      console.log(`Setting status: ${status}`);
       set((state) => {
         state.status = status;
       });

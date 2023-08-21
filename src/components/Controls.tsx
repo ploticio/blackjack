@@ -21,7 +21,7 @@ export default function Controls() {
 
   // Check for player busting
   useEffect(() => {
-    if (playerSum() > 21) setStatus(Status.Loss);
+    if (playerSum().hardTotal > 21) setStatus(Status.Loss);
   }, [playerHand, playerSum, setStatus]);
 
   // Handle Player busting
@@ -35,11 +35,13 @@ export default function Controls() {
   useEffect(() => {
     if (playerStanding) {
       flipCard();
-      while (dealerSum() < 17) addToDealer(sample());
-      if (dealerSum() > 21) setStatus(Status.Win);
+      while (dealerSum().softTotal < 17) addToDealer(sample());
+      if (dealerSum().hardTotal > 21) setStatus(Status.Win);
       else {
-        if (playerSum() > dealerSum()) setStatus(Status.Win);
-        else if (playerSum() < dealerSum()) setStatus(Status.Loss);
+        const pSum = playerSum().softTotal <= 21 ? playerSum().softTotal : playerSum().hardTotal;
+        const dSum = dealerSum().softTotal <= 21 ? dealerSum().softTotal : dealerSum().hardTotal;
+        if (pSum > dSum) setStatus(Status.Win);
+        else if (pSum < dSum) setStatus(Status.Loss);
         else setStatus(Status.Push);
       }
     }

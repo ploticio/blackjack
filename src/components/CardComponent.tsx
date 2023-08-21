@@ -10,7 +10,7 @@ export default function CardComponent({ card }: IProps) {
     <>
       <div className="card">
         <img src={card.image} />
-        <h2>{card.image !== card_back ? card.value : "?"}</h2>
+        {/* <h2>{card.image !== card_back ? card.value : "?"}</h2> */}
       </div>
     </>
   );
