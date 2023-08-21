@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { Card, deck } from "../utilities/cards";
+import { Card, back_card, deck } from "../utilities/cards";
 
 export enum Status {
   Menu = "Menu",
@@ -22,21 +22,21 @@ interface IState {
   discarded: Card[];
   bank: number;
   tempCard: Card;
-  holeCardImg: string;
   playerStanding: boolean;
   status: Status;
+  holeCard: Card;
 
   shuffle: () => void;
   sample: () => Card;
   addToPlayer: (newCard: Card) => void;
   addToDealer: (newCard: Card) => void;
   resetHands: () => void;
-  setHoleImg: (img: string) => void;
   flipCard: () => void;
   setPlayerStanding: (value: boolean) => void;
   getPlayerSum: () => Sum;
   getDealerSum: () => Sum;
   setStatus: (status: Status) => void;
+  addHoleCard: () => void;
 }
 
 export const useStore = create<IState>()(
@@ -52,6 +52,7 @@ export const useStore = create<IState>()(
     dealerBust: false,
     playerStanding: false,
     status: Status.Menu,
+    holeCard: {} as Card,
 
     shuffle: () => {
       set((state) => {
@@ -91,15 +92,9 @@ export const useStore = create<IState>()(
       });
     },
 
-    setHoleImg: (img) => {
-      set((state) => {
-        state.holeCardImg = img;
-      });
-    },
-
     flipCard: () => {
       set((state) => {
-        state.dealerHand[state.dealerHand.length - 1].image = state.holeCardImg;
+        state.dealerHand[state.dealerHand.length - 1] = state.holeCard;
       });
     },
 
@@ -136,6 +131,13 @@ export const useStore = create<IState>()(
     setStatus: (status) => {
       set((state) => {
         state.status = status;
+      });
+    },
+
+    addHoleCard: () => {
+      set((state) => {
+        state.holeCard = state.sample();
+        state.dealerHand.push({ ...back_card });
       });
     },
   }))

@@ -1,5 +1,5 @@
 import "../styles/CardComponent.css";
-import { Card, card_back } from "../utilities/cards";
+import { Card } from "../utilities/cards";
 
 interface IProps {
   card: Card;
@@ -10,7 +10,7 @@ export default function CardComponent({ card }: IProps) {
     <>
       <div className="card">
         <img src={card.image} />
-        {/* <h2>{card.image !== card_back ? card.value : "?"}</h2> */}
+        {/* <h2>{card.value !== 0 ? card.value : "?"}</h2> */}
       </div>
     </>
   );

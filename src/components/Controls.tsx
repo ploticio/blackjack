@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useStore, Status } from "../store/store";
-import { card_back } from "../utilities/cards";
 
 export default function Controls() {
   const resetHands = useStore((state) => state.resetHands);
@@ -16,7 +15,7 @@ export default function Controls() {
 
   const addToPlayer = useStore((state) => state.addToPlayer);
   const setPlayerStanding = useStore((state) => state.setPlayerStanding);
-  const setHoleImg = useStore((state) => state.setHoleImg);
+  const addHoleCard = useStore((state) => state.addHoleCard);
   const setStatus = useStore((state) => state.setStatus);
 
   // Check for player busting
@@ -51,10 +50,7 @@ export default function Controls() {
     resetHands();
 
     addToDealer(sample());
-    const holeCard = { ...sample() };
-    setHoleImg(holeCard.image);
-    holeCard.image = card_back;
-    addToDealer(holeCard);
+    addHoleCard();
 
     addToPlayer(sample());
     addToPlayer(sample());
