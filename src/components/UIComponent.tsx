@@ -1,6 +1,7 @@
 import { useStore, Status } from "../store/store";
 import StartMenu from "./StartMenu";
 import GameUI from "./Game/GameUI";
+import BankUI from "./Bank/BankUI";
 
 export default function UIComponent() {
   const status = useStore((state) => state.status);
@@ -14,6 +15,8 @@ export default function UIComponent() {
             <StartMenu />
           </>
         );
+      case Status.Betting:
+        return <BankUI />;
       default:
         return (
           <>

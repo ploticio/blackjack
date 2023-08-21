@@ -40,7 +40,9 @@ interface IState {
   setStatus: (status: Status) => void;
   addHoleCard: () => void;
   changeBet: (betAmount: number) => void;
+  getBet: () => number;
   changeBank: (amount: number) => void;
+  printDealerCards: () => void;
 }
 
 export const useStore = create<IState>()(
@@ -152,10 +154,17 @@ export const useStore = create<IState>()(
       });
     },
 
+    getBet: () => get().bet,
+
     changeBank: (amount) => {
       set((state) => {
         state.bank += amount;
       });
+    },
+
+    printDealerCards: () => {
+      const dealerArray = get().dealerHand.map((card) => card.value);
+      console.log(dealerArray);
     },
   }))
 );
