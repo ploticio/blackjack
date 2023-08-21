@@ -34,7 +34,9 @@ export default function Controls() {
   useEffect(() => {
     if (playerStanding) {
       flipCard();
-      while (dealerSum().softTotal < 17) addToDealer(sample());
+      while (dealerSum().softTotal < 17 || (dealerSum().softTotal > 21 && dealerSum().hardTotal < 17)) {
+        addToDealer(sample());
+      }
       if (dealerSum().hardTotal > 21) setStatus(Status.Win);
       else {
         const pSum = playerSum().softTotal <= 21 ? playerSum().softTotal : playerSum().hardTotal;
