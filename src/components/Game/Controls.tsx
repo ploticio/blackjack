@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useStore, Status } from "../store/store";
+import { useStore, Status } from "../../store/store";
 
 export default function Controls() {
   const resetHands = useStore((state) => state.resetHands);

@@ -1,5 +1,5 @@
-import "../styles/CardComponent.css";
-import { Card } from "../utilities/cards";
+import "../../styles/CardComponent.css";
+import { Card } from "../../utilities/cards";
 
 interface IProps {
   card: Card;

@@ -1,5 +1,5 @@
 import "../../styles/HandComponent.css";
-import CardComponent from "../CardComponent";
+import CardComponent from "../Game/CardComponent";
 import { Card } from "../../utilities/cards";
 
 interface IProps {

@@ -1,4 +1,4 @@
-import { useStore } from "../store/store";
+import { useStore } from "../../store/store";
 
 export default function Outcome() {
   const status = useStore((state) => state.status);

@@ -4,6 +4,7 @@ import { Card, back_card, deck } from "../utilities/cards";
 
 export enum Status {
   Menu = "Menu",
+  Betting = "Betting",
   Playing = "Playing",
   Win = "Win!",
   Loss = "Loss!",
@@ -20,11 +21,12 @@ interface IState {
   playerHand: Card[];
   dealerHand: Card[];
   discarded: Card[];
-  bank: number;
   tempCard: Card;
   playerStanding: boolean;
   status: Status;
   holeCard: Card;
+  bank: number;
+  bet: number;
 
   shuffle: () => void;
   sample: () => Card;
@@ -37,6 +39,8 @@ interface IState {
   getDealerSum: () => Sum;
   setStatus: (status: Status) => void;
   addHoleCard: () => void;
+  changeBet: (betAmount: number) => void;
+  changeBank: (amount: number) => void;
 }
 
 export const useStore = create<IState>()(
@@ -45,7 +49,6 @@ export const useStore = create<IState>()(
     playerHand: [],
     dealerHand: [],
     discarded: [],
-    bank: 1000,
     tempCard: {} as Card,
     startScreen: true,
     holeCardImg: "",
@@ -53,6 +56,8 @@ export const useStore = create<IState>()(
     playerStanding: false,
     status: Status.Menu,
     holeCard: {} as Card,
+    bank: 1000,
+    bet: 0,
 
     shuffle: () => {
       set((state) => {
@@ -138,6 +143,18 @@ export const useStore = create<IState>()(
       set((state) => {
         state.holeCard = state.sample();
         state.dealerHand.push({ ...back_card });
+      });
+    },
+
+    changeBet: (betAmount) => {
+      set((state) => {
+        state.bet += betAmount;
+      });
+    },
+
+    changeBank: (amount) => {
+      set((state) => {
+        state.bank += amount;
       });
     },
   }))
