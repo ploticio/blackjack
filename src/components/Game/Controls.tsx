@@ -11,26 +11,26 @@ export default function Controls() {
 
   const flipCard = useStore((state) => state.flipCard);
   const sample = useStore((state) => state.sample);
-  const addToDealer = useStore((state) => state.addToDealer);
 
+  const addToDealer = useStore((state) => state.addToDealer);
   const addToPlayer = useStore((state) => state.addToPlayer);
+
   const setPlayerStanding = useStore((state) => state.setPlayerStanding);
   const setStatus = useStore((state) => state.setStatus);
 
+  const bank = useStore((state) => state.bank);
   const bet = useStore((state) => state.getBet);
   const changeBank = useStore((state) => state.changeBank);
   const changeBet = useStore((state) => state.changeBet);
 
-  const printDealerCards = useStore((state) => state.printDealerCards);
-
   // Check for player busting
   useEffect(() => {
-    if (playerSum().hardTotal > 21) setStatus(Status.Loss);
+    if (playerSum().hardTotal > 21) setStatus(Status.Bust);
   }, [playerHand, playerSum, setStatus]);
 
   // Handle Player outcomes
   useEffect(() => {
-    if (status === Status.Loss) {
+    if (status === Status.Bust) {
       flipCard();
     } else if (status === Status.Push) {
       changeBank(bet());
@@ -46,22 +46,28 @@ export default function Controls() {
       while (dealerSum().softTotal < 17 || (dealerSum().softTotal > 21 && dealerSum().hardTotal < 17)) {
         addToDealer(sample());
       }
-      if (dealerSum().hardTotal > 21) setStatus(Status.Win);
-      else {
+      if (dealerSum().hardTotal > 21) {
+        setStatus(Status.Win);
+      } else {
         const pSum = playerSum().softTotal <= 21 ? playerSum().softTotal : playerSum().hardTotal;
         const dSum = dealerSum().softTotal <= 21 ? dealerSum().softTotal : dealerSum().hardTotal;
         if (pSum > dSum) setStatus(Status.Win);
         else if (pSum < dSum) {
           setStatus(Status.Loss);
-          console.log(`pSum: ${pSum} < dSum ${dSum}`);
-          printDealerCards();
         } else setStatus(Status.Push);
       }
     }
-  }, [playerStanding, flipCard, dealerSum, playerSum, addToDealer, sample, setStatus, printDealerCards]);
+  }, [playerStanding, flipCard, dealerSum, playerSum, addToDealer, sample, setStatus]);
 
   const handleHit = () => {
-    if (status === Status.Playing) addToPlayer(sample());
+    addToPlayer(sample());
+  };
+
+  const handleDouble = () => {
+    changeBank(-1 * bet());
+    changeBet(2 * bet());
+    addToPlayer(sample());
+    setPlayerStanding(true);
   };
 
   const handleNewRound = () => {
@@ -73,8 +79,13 @@ export default function Controls() {
 
   return (
     <>
-      <button onClick={() => handleHit()}>Hit</button>
-      <button onClick={() => setPlayerStanding(true)}>Stand</button>
+      {status === Status.Playing && (
+        <>
+          <button onClick={() => handleHit()}>Hit</button>
+          <button onClick={() => setPlayerStanding(true)}>Stand</button>
+          {/* {2 * bet() <= bank && <button onClick={() => handleDouble()}>Double</button>} */}
+        </>
+      )}
       <button onClick={() => handleNewRound()}>Reset Hands</button>
     </>
   );

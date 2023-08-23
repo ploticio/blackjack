@@ -8,6 +8,7 @@ export enum Status {
   Betting = "Betting",
   Playing = "Playing",
   Win = "Win!",
+  Bust = "Bust!",
   Loss = "Loss!",
   Push = "Push!",
 }
@@ -32,6 +33,8 @@ interface IState {
   shuffle: () => void;
   sample: () => Card;
   addToPlayer: (newCard: Card) => void;
+  addToP: () => void;
+  addToD: () => void;
   addToDealer: (newCard: Card) => void;
   resetHands: () => void;
   flipCard: () => void;
@@ -43,7 +46,6 @@ interface IState {
   changeBet: (betAmount: number) => void;
   getBet: () => number;
   changeBank: (amount: number) => void;
-  printDealerCards: () => void;
 }
 
 export const useStore = create<IState>()(
@@ -87,9 +89,27 @@ export const useStore = create<IState>()(
         });
       },
 
+      addToP: () => {
+        set((state) => {
+          if (state.shoe.length) {
+            const temp = state.shoe.pop()!;
+            state.playerHand.push(temp);
+          }
+        });
+      },
+
       addToDealer: (newCard) => {
         set((state) => {
           state.dealerHand.push(newCard);
+        });
+      },
+
+      addToD: () => {
+        set((state) => {
+          if (state.shoe.length) {
+            const temp = state.shoe.pop()!;
+            state.dealerHand.push(temp);
+          }
         });
       },
 
@@ -164,11 +184,6 @@ export const useStore = create<IState>()(
         set((state) => {
           state.bank += amount;
         });
-      },
-
-      printDealerCards: () => {
-        const dealerArray = get().dealerHand.map((card) => card.value);
-        console.log(dealerArray);
       },
     }))
   )

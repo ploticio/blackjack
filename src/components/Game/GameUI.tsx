@@ -5,7 +5,7 @@ import HandsDisplay from "./HandsDisplay";
 
 export default function GameUI() {
   const status = useStore((state) => state.status);
-  const ifOutcome = status === Status.Win || status === Status.Loss || status === Status.Push;
+  const ifOutcome = status === Status.Win || status === Status.Push || status === Status.Loss || status === Status.Bust;
 
   return (
     <>
