@@ -65,9 +65,10 @@ export default function Controls() {
 
   const handleDouble = () => {
     changeBank(-1 * bet());
-    changeBet(2 * bet());
-    addToPlayer(sample());
-    setPlayerStanding(true);
+    changeBet(bet());
+    const temp = sample();
+    if (temp.value + playerSum().hardTotal <= 21) setPlayerStanding(true);
+    addToPlayer(temp);
   };
 
   const handleNewRound = () => {
@@ -83,7 +84,7 @@ export default function Controls() {
         <>
           <button onClick={() => handleHit()}>Hit</button>
           <button onClick={() => setPlayerStanding(true)}>Stand</button>
-          {/* {2 * bet() <= bank && <button onClick={() => handleDouble()}>Double</button>} */}
+          {bet() <= bank && <button onClick={() => handleDouble()}>Double</button>}
         </>
       )}
       <button onClick={() => handleNewRound()}>Reset Hands</button>
