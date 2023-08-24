@@ -7,6 +7,7 @@ export default function BankControls() {
   const addToDealer = useStore((state) => state.addToDealer);
   const addToPlayer = useStore((state) => state.addToPlayer);
   const addHoleCard = useStore((state) => state.addHoleCard);
+  const checkBlackjack = useStore((state) => state.checkBlackjack);
 
   const bank = useStore((state) => state.bank);
   const bet = useStore((state) => state.bet);
@@ -25,6 +26,7 @@ export default function BankControls() {
     addToDealer(sample());
     addToPlayer(sample());
     addHoleCard();
+    checkBlackjack();
   };
 
   const handleChangeBet = (amount: number) => {

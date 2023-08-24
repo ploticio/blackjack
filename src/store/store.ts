@@ -24,7 +24,6 @@ interface IState {
   dealerHand: Card[];
   discarded: Card[];
   tempCard: Card;
-  playerStanding: boolean;
   status: Status;
   holeCard: Card;
   bank: number;
@@ -33,19 +32,16 @@ interface IState {
   shuffle: () => void;
   sample: () => Card;
   addToPlayer: (newCard: Card) => void;
-  addToP: () => void;
-  addToD: () => void;
   addToDealer: (newCard: Card) => void;
   resetHands: () => void;
   flipCard: () => void;
-  setPlayerStanding: (value: boolean) => void;
   getPlayerSum: () => Sum;
   getDealerSum: () => Sum;
   setStatus: (status: Status) => void;
   addHoleCard: () => void;
   changeBet: (betAmount: number) => void;
-  getBet: () => number;
   changeBank: (amount: number) => void;
+  checkBlackjack: () => void;
 }
 
 export const useStore = create<IState>()(
@@ -57,9 +53,7 @@ export const useStore = create<IState>()(
       discarded: [],
       tempCard: {} as Card,
       startScreen: true,
-      holeCardImg: "",
       dealerBust: false,
-      playerStanding: false,
       status: Status.Menu,
       holeCard: {} as Card,
       bank: 1000,
@@ -89,27 +83,9 @@ export const useStore = create<IState>()(
         });
       },
 
-      addToP: () => {
-        set((state) => {
-          if (state.shoe.length) {
-            const temp = state.shoe.pop()!;
-            state.playerHand.push(temp);
-          }
-        });
-      },
-
       addToDealer: (newCard) => {
         set((state) => {
           state.dealerHand.push(newCard);
-        });
-      },
-
-      addToD: () => {
-        set((state) => {
-          if (state.shoe.length) {
-            const temp = state.shoe.pop()!;
-            state.dealerHand.push(temp);
-          }
         });
       },
 
@@ -124,12 +100,6 @@ export const useStore = create<IState>()(
       flipCard: () => {
         set((state) => {
           state.dealerHand[state.dealerHand.length - 1] = state.holeCard;
-        });
-      },
-
-      setPlayerStanding: (value) => {
-        set((state) => {
-          state.playerStanding = value;
         });
       },
 
@@ -178,12 +148,30 @@ export const useStore = create<IState>()(
         });
       },
 
-      getBet: () => get().bet,
-
       changeBank: (amount) => {
         set((state) => {
           state.bank += amount;
         });
+      },
+
+      checkBlackjack: () => {
+        const pBlackjack = get().getPlayerSum().softTotal === 21 ? true : false;
+        const dBlackjack =
+          (get().dealerHand[0].value === 1 && get().holeCard.value === 10) ||
+          (get().dealerHand[0].value === 10 && get().holeCard.value === 1)
+            ? true
+            : false;
+        if (pBlackjack && !dBlackjack) {
+          get().flipCard();
+          get().setStatus(Status.Win);
+          get().changeBank(0.5 * get().bet);
+        } else if (!pBlackjack && dBlackjack) {
+          get().flipCard();
+          get().setStatus(Status.Loss);
+        } else if (pBlackjack && dBlackjack) {
+          get().flipCard();
+          get().setStatus(Status.Push);
+        }
       },
     }))
   )

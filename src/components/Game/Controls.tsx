@@ -1,10 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStore, Status } from "../../store/store";
 
 export default function Controls() {
   const resetHands = useStore((state) => state.resetHands);
-  const playerHand = useStore((state) => state.playerHand);
-  const playerStanding = useStore((state) => state.playerStanding);
+
   const playerSum = useStore((state) => state.getPlayerSum);
   const dealerSum = useStore((state) => state.getDealerSum);
   const status = useStore((state) => state.status);
@@ -15,29 +14,25 @@ export default function Controls() {
   const addToDealer = useStore((state) => state.addToDealer);
   const addToPlayer = useStore((state) => state.addToPlayer);
 
-  const setPlayerStanding = useStore((state) => state.setPlayerStanding);
   const setStatus = useStore((state) => state.setStatus);
 
   const bank = useStore((state) => state.bank);
-  const bet = useStore((state) => state.getBet);
+  const bet = useStore((state) => state.bet);
   const changeBank = useStore((state) => state.changeBank);
   const changeBet = useStore((state) => state.changeBet);
 
-  // Check for player busting
-  useEffect(() => {
-    if (playerSum().hardTotal > 21) setStatus(Status.Bust);
-  }, [playerHand, playerSum, setStatus]);
+  const [playerStanding, setPlayerStanding] = useState(false);
 
   // Handle Player outcomes
   useEffect(() => {
     if (status === Status.Bust) {
       flipCard();
     } else if (status === Status.Push) {
-      changeBank(bet());
+      changeBank(bet);
     } else if (status === Status.Win) {
-      changeBank(2 * bet());
+      changeBank(2 * bet);
     }
-  }, [status, flipCard, setStatus, changeBank, bet]);
+  }, [status, flipCard, changeBank, bet]);
 
   // Handle Player standing
   useEffect(() => {
@@ -64,8 +59,8 @@ export default function Controls() {
   };
 
   const handleDouble = () => {
-    changeBank(-1 * bet());
-    changeBet(bet());
+    changeBank(-1 * bet);
+    changeBet(bet);
     const temp = sample();
     if (temp.value + playerSum().hardTotal <= 21) setPlayerStanding(true);
     addToPlayer(temp);
@@ -74,7 +69,7 @@ export default function Controls() {
   const handleNewRound = () => {
     resetHands();
     setPlayerStanding(false);
-    changeBet(-1 * bet());
+    changeBet(-1 * bet);
     setStatus(Status.Betting);
   };
 
@@ -84,7 +79,7 @@ export default function Controls() {
         <>
           <button onClick={() => handleHit()}>Hit</button>
           <button onClick={() => setPlayerStanding(true)}>Stand</button>
-          {bet() <= bank && <button onClick={() => handleDouble()}>Double</button>}
+          {bet <= bank && <button onClick={() => handleDouble()}>Double</button>}
         </>
       )}
       <button onClick={() => handleNewRound()}>Reset Hands</button>
