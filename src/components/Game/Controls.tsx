@@ -1,88 +1,204 @@
-import { useEffect, useState } from "react";
-import { useStore, Status } from "../../store/store";
+import { useRef } from "react";
+import { useSnapshot } from "valtio";
+import { GameState, state } from "../../store/store";
+import { Status } from "../../utilities/hands";
 
 export default function Controls() {
-  const resetHands = useStore((state) => state.resetHands);
+  const snapshot = useSnapshot(state);
 
-  const playerSum = useStore((state) => state.getPlayerSum);
-  const dealerSum = useStore((state) => state.getDealerSum);
-  const status = useStore((state) => state.status);
-
-  const flipCard = useStore((state) => state.flipCard);
-  const sample = useStore((state) => state.sample);
-
-  const addToDealer = useStore((state) => state.addToDealer);
-  const addToPlayer = useStore((state) => state.addToPlayer);
-
-  const setStatus = useStore((state) => state.setStatus);
-
-  const bank = useStore((state) => state.bank);
-  const bet = useStore((state) => state.bet);
-  const changeBank = useStore((state) => state.changeBank);
-  const changeBet = useStore((state) => state.changeBet);
-
-  const [playerStanding, setPlayerStanding] = useState(false);
-
-  // Handle Player outcomes
-  useEffect(() => {
-    if (status === Status.Bust) {
-      flipCard();
-    } else if (status === Status.Push) {
-      changeBank(bet);
-    } else if (status === Status.Win) {
-      changeBank(2 * bet);
-    }
-  }, [status, flipCard, changeBank, bet]);
-
-  // Handle Player standing
-  useEffect(() => {
-    if (playerStanding) {
-      flipCard();
-      while (dealerSum().softTotal < 17 || (dealerSum().softTotal > 21 && dealerSum().hardTotal < 17)) {
-        addToDealer(sample());
-      }
-      if (dealerSum().hardTotal > 21) {
-        setStatus(Status.Win);
-      } else {
-        const pSum = playerSum().softTotal <= 21 ? playerSum().softTotal : playerSum().hardTotal;
-        const dSum = dealerSum().softTotal <= 21 ? dealerSum().softTotal : dealerSum().hardTotal;
-        if (pSum > dSum) setStatus(Status.Win);
-        else if (pSum < dSum) {
-          setStatus(Status.Loss);
-        } else setStatus(Status.Push);
-      }
-    }
-  }, [playerStanding, flipCard, dealerSum, playerSum, addToDealer, sample, setStatus]);
+  const activeHand = useRef(state.playerHand);
+  const activeHandSnapshot = activeHand.current == state.playerHand ? snapshot.playerHand : snapshot.splitHand;
 
   const handleHit = () => {
-    addToPlayer(sample());
+    activeHand.current.hand.addRandom();
+    // Check for busts
+    if (activeHand.current.hand.getSum().hardTotal > 21) {
+      activeHand.current.hand.status = Status.Bust;
+      // Single hand bust
+      if (activeHand.current == state.playerHand && state.splitHand.hand.status !== Status.Standing) {
+        state.dealerHand.flipCard();
+        state.dealerHand.hand.status = Status.Win;
+      }
+      // Two hand playerdeck bust
+      else if (activeHand.current == state.playerHand && state.splitHand.hand.status == Status.Standing)
+        handleStanding();
+      // Two hand splitdeck bust
+      else if (activeHand.current == state.splitHand) {
+        state.playerHand.hand.addRandom();
+        // Check if playerhand gets a blackjack after splithand busts
+        state.playerHand.checkBlackjack();
+        if (state.playerHand.blackjack) {
+          state.playerHand.hand.status = Status.Win;
+          handleStanding();
+        }
+      }
+      switchIfSplit();
+    }
+    // Stand immediately if hardtotal is equal to 21
+    else if (activeHand.current.hand.getSum().hardTotal === 21) {
+      if (activeHand.current == state.playerHand) handleStanding();
+      else {
+        activeHand.current.hand.status = Status.Standing;
+        state.playerHand.hand.addRandom();
+        switchIfSplit();
+      }
+    }
+  };
+
+  const handleStanding = () => {
+    // Switch to playerhand if currently splithand
+    if (activeHand.current == state.splitHand) {
+      activeHand.current.hand.status = Status.Standing;
+      activeHand.current = state.playerHand;
+      state.playerHand.hand.addRandom();
+      // Check if playerhand gets blackjack after splithand stands
+      state.playerHand.checkBlackjack();
+      if (state.playerHand.blackjack) {
+        state.playerHand.hand.status = Status.Win;
+        handleStanding();
+      }
+    }
+    // Hit dealer
+    else {
+      if (state.playerHand.hand.status !== Status.Bust && state.playerHand.hand.status !== Status.Win)
+        // All hands set from playing => standing except for busts / split blackjacks
+        state.playerHand.hand.status = Status.Standing;
+      state.dealerHand.flipCard();
+      // Stand on soft 17
+      while (
+        state.dealerHand.hand.getSum().softTotal < 17 ||
+        (state.dealerHand.hand.getSum().softTotal > 21 && state.dealerHand.hand.getSum().hardTotal < 17)
+      ) {
+        state.dealerHand.hand.addRandom();
+      }
+      state.dealerHand.hand.status = Status.Standing;
+      // Check for dealer bust
+      if (state.dealerHand.hand.getSum().hardTotal > 21) {
+        state.dealerHand.hand.status = Status.Bust;
+        if (state.playerHand.hand.status === Status.Standing) state.playerHand.hand.status = Status.Win;
+        if (state.splitHand.hand.status === Status.Standing) state.splitHand.hand.status = Status.Win;
+      } else {
+        const dSum =
+          state.dealerHand.hand.getSum().softTotal <= 21
+            ? state.dealerHand.hand.getSum().softTotal
+            : state.dealerHand.hand.getSum().hardTotal;
+        // Compare playerhand if not already busted
+        if (state.playerHand.hand.status === Status.Standing) {
+          const pSum =
+            state.playerHand.hand.getSum().softTotal <= 21
+              ? state.playerHand.hand.getSum().softTotal
+              : state.playerHand.hand.getSum().hardTotal;
+          if (pSum > dSum) state.playerHand.hand.status = Status.Win;
+          else if (pSum < dSum) state.playerHand.hand.status = Status.Loss;
+          else state.playerHand.hand.status = Status.Push;
+        }
+        // Compare splithand if not already busted
+        if (state.splitHand.hand.status === Status.Standing) {
+          const sSum =
+            state.splitHand.hand.getSum().softTotal <= 21
+              ? state.splitHand.hand.getSum().softTotal
+              : state.splitHand.hand.getSum().hardTotal;
+          if (sSum > dSum) state.splitHand.hand.status = Status.Win;
+          else if (sSum < dSum) state.splitHand.hand.status = Status.Loss;
+          else state.splitHand.hand.status = Status.Push;
+        }
+      }
+    }
   };
 
   const handleDouble = () => {
-    changeBank(-1 * bet);
-    changeBet(bet);
-    const temp = sample();
-    if (temp.value + playerSum().hardTotal <= 21) setPlayerStanding(true);
-    addToPlayer(temp);
+    activeHand.current.bet *= 2;
+    handleHit();
+    // Prevent handleStanding from being called twice
+    if (
+      state.playerHand.hand.getSum().hardTotal !== 21 &&
+      state.playerHand.hand.status !== Status.Bust &&
+      state.splitHand.hand.getSum().hardTotal !== 21 &&
+      state.splitHand.hand.status !== Status.Bust
+    )
+      handleStanding();
+  };
+
+  const handleSplit = () => {
+    const temp = state.playerHand.hand.removeEnd();
+    state.splitHand.hand.addToHand(temp);
+    state.splitHand.hand.addRandom();
+    state.splitHand.bet = activeHandSnapshot.bet;
+    activeHand.current = state.splitHand;
+    // Check if blackjack immediately after splitting
+    state.splitHand.checkBlackjack();
+    if (state.splitHand.blackjack) {
+      state.splitHand.hand.status = Status.Win;
+      switchIfSplit();
+      // Check for double blackjack
+      state.playerHand.hand.addRandom();
+      state.playerHand.checkBlackjack();
+      if (state.playerHand.blackjack) {
+        state.playerHand.hand.status = Status.Win;
+        state.dealerHand.flipCard();
+      }
+    }
   };
 
   const handleNewRound = () => {
-    resetHands();
-    setPlayerStanding(false);
-    changeBet(-1 * bet);
-    setStatus(Status.Betting);
+    state.dealerHand.resetHand();
+    state.playerHand.resetHand();
+    state.splitHand.resetHand();
+    handleEarnings();
+    state.gameState = GameState.Betting;
+  };
+
+  const handleEarnings = () => {
+    let earnings = 0;
+    // Handle player hand earnings
+    if (snapshot.playerHand.hand.status === Status.Win) {
+      earnings += snapshot.playerHand.bet;
+      if (snapshot.playerHand.blackjack) earnings += snapshot.playerHand.bet * 0.5;
+    } else if (snapshot.playerHand.hand.status === Status.Loss || snapshot.playerHand.hand.status === Status.Bust)
+      earnings -= snapshot.playerHand.bet;
+    // Handle split hand earnings
+    if (snapshot.splitHand.hand.status === Status.Win) {
+      earnings += snapshot.splitHand.bet;
+      if (snapshot.splitHand.blackjack) earnings += snapshot.splitHand.bet * 0.5;
+    } else if (snapshot.splitHand.hand.status === Status.Loss || snapshot.splitHand.hand.status === Status.Bust)
+      earnings -= snapshot.splitHand.bet;
+    state.bank += earnings;
+  };
+
+  const switchIfSplit = () => {
+    if (activeHand.current == state.splitHand) activeHand.current = state.playerHand;
+  };
+
+  const canSplit = () => {
+    return (
+      snapshot.playerHand.hand.cards.length === 2 &&
+      snapshot.playerHand.hand.cards[0].value === snapshot.playerHand.hand.cards[1].value &&
+      snapshot.bank - snapshot.playerHand.bet >= snapshot.playerHand.bet &&
+      activeHandSnapshot !== snapshot.splitHand &&
+      snapshot.splitHand.hand.status !== Status.Standing &&
+      snapshot.splitHand.hand.status !== Status.Win &&
+      snapshot.splitHand.hand.status !== Status.Bust
+    );
+  };
+
+  const canDouble = () => {
+    const combined = snapshot.playerHand.bet + snapshot.splitHand.bet;
+    return activeHandSnapshot.hand.cards.length === 2 && snapshot.bank - combined >= 2 * activeHandSnapshot.bet;
   };
 
   return (
-    <>
-      {status === Status.Playing && (
+    <div>
+      {activeHandSnapshot.hand.status === Status.Playing && (
         <>
           <button onClick={() => handleHit()}>Hit</button>
-          <button onClick={() => setPlayerStanding(true)}>Stand</button>
-          {bet <= bank && <button onClick={() => handleDouble()}>Double</button>}
+          <button onClick={() => handleStanding()}>Stand</button>
+          {canDouble() && <button onClick={() => handleDouble()}>Double</button>}
+          {canSplit() && <button onClick={() => handleSplit()}>Split</button>}
         </>
       )}
-      <button onClick={() => handleNewRound()}>Reset Hands</button>
-    </>
+      {snapshot.playerHand.hand.status !== Status.Playing && (
+        <button onClick={() => handleNewRound()}>Reset Hands</button>
+      )}
+    </div>
   );
 }

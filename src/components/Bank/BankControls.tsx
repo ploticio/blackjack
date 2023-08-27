@@ -1,36 +1,48 @@
-import { Status, useStore } from "../../store/store";
+import { useSnapshot } from "valtio";
+import { state, GameState } from "../../store/store";
+import { Status } from "../../utilities/hands";
 
 export default function BankControls() {
-  const setStatus = useStore((state) => state.setStatus);
-  // const shuffle = useStore((state) => state.shuffle);
-  const sample = useStore((state) => state.sample);
-  const addToDealer = useStore((state) => state.addToDealer);
-  const addToPlayer = useStore((state) => state.addToPlayer);
-  const addHoleCard = useStore((state) => state.addHoleCard);
-  const checkBlackjack = useStore((state) => state.checkBlackjack);
-
-  const bank = useStore((state) => state.bank);
-  const bet = useStore((state) => state.bet);
-  const changeBank = useStore((state) => state.changeBank);
-  const changeBet = useStore((state) => state.changeBet);
+  const snapshot = useSnapshot(state);
 
   const handleSubmit = () => {
-    changeBank(-1 * bet);
+    state.playerHand.bet = state.bet;
+    state.gameState = GameState.Playing;
+    initGame();
+  };
 
-    setStatus(Status.Playing);
-    // for (let i = 0; i < 10; i++) {
-    //   shuffle();
-    // }
+  const initGame = () => {
+    state.playerHand.hand.addRandom();
+    state.dealerHand.hand.addRandom();
+    state.playerHand.hand.addRandom();
+    state.dealerHand.addHoleCard();
+    state.bet = 0;
+    handleBlackjacks();
+  };
 
-    addToPlayer(sample());
-    addToDealer(sample());
-    addToPlayer(sample());
-    addHoleCard();
-    checkBlackjack();
+  const handleBlackjacks = () => {
+    // Handle Blackjack at game start
+    state.playerHand.checkBlackjack();
+    state.dealerHand.checkBlackjack();
+    const pBlackjack = state.playerHand.blackjack;
+    const dBlackjack = state.dealerHand.blackjack;
+    if (pBlackjack && !dBlackjack) {
+      state.dealerHand.flipCard();
+      state.dealerHand.hand.status = Status.Loss;
+      state.playerHand.hand.status = Status.Win;
+    } else if (!pBlackjack && dBlackjack) {
+      state.dealerHand.flipCard();
+      state.dealerHand.hand.status = Status.Win;
+      state.playerHand.hand.status = Status.Loss;
+    } else if (pBlackjack && dBlackjack) {
+      state.dealerHand.flipCard();
+      state.playerHand.hand.status = Status.Push;
+      state.dealerHand.hand.status = Status.Push;
+    }
   };
 
   const handleChangeBet = (amount: number) => {
-    if (bet < bank) changeBet(amount);
+    if (snapshot.bet < snapshot.bank) state.bet = snapshot.bet + amount;
   };
 
   return (
@@ -40,7 +52,7 @@ export default function BankControls() {
       <button onClick={() => handleChangeBet(25)}>+25</button>
       <button onClick={() => handleChangeBet(50)}>+50</button>
       <button onClick={() => handleChangeBet(100)}>+100</button>
-      <button onClick={() => changeBet(-1 * bet)}>Reset</button>
+      <button onClick={() => (state.bet = 0)}>Reset</button>
       <button onClick={() => handleSubmit()}>Submit Bet</button>
     </>
   );

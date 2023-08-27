@@ -1,15 +1,28 @@
-import { useStore } from "../../store/store";
+import "../../styles/PlayerHand.css";
 import HandComponent from "./HandComponent";
-import HandSum from "./HandSum";
+import { state } from "../../store/store";
+import { useSnapshot } from "valtio";
 
 export default function PlayerHand() {
-  const playerHand = useStore((state) => state.playerHand);
-  const playerSum = useStore((state) => state.getPlayerSum);
+  const snapshot = useSnapshot(state);
+
   return (
-    <>
+    <div>
       <h1>Player</h1>
-      <HandComponent cards={playerHand} />
-      <HandSum sum={playerSum()} />
-    </>
+      <div className="hand-container">
+        <HandComponent
+          cards={snapshot.playerHand.hand.cards}
+          status={snapshot.playerHand.hand.status}
+          showStatus={true}
+        />
+        {snapshot.splitHand.hand.cards.length > 0 && (
+          <HandComponent
+            cards={snapshot.splitHand.hand.cards}
+            status={snapshot.splitHand.hand.status}
+            showStatus={true}
+          />
+        )}
+      </div>
+    </div>
   );
 }

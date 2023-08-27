@@ -1,0 +1,6 @@
+.hand-container {
+  display: flex;
+  justify-content: center;
+  gap: 200px;
+  align-items: flex-end;
+}

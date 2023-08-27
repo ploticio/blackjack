@@ -1,10 +1,11 @@
-import { useStore } from "../../store/store";
+import { useSnapshot } from "valtio";
+import { state } from "../../store/store";
 
 export default function MoneyComponent() {
-  const bank = useStore((state) => state.bank);
+  const snapshot = useSnapshot(state);
   return (
     <>
-      <h1>Bank: {bank}</h1>
+      <h1>Bank: {snapshot.bank}</h1>
     </>
   );
 }

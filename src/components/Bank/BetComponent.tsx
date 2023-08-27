@@ -1,10 +1,11 @@
-import { useStore } from "../../store/store";
+import { useSnapshot } from "valtio";
+import { state } from "../../store/store";
 
 export default function BetComponent() {
-  const bet = useStore((state) => state.bet);
+  const snapshot = useSnapshot(state);
   return (
     <>
-      <h1>Bet: {bet}</h1>
+      <h1>Bet: {snapshot.bet}</h1>
     </>
   );
 }

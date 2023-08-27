@@ -1,21 +1,22 @@
-import { useStore, Status } from "../store/store";
 import StartMenu from "./StartMenu";
 import GameUI from "./Game/GameUI";
 import BankUI from "./Bank/BankUI";
+import { useSnapshot } from "valtio";
+import { state, GameState } from "../store/store";
 
 export default function UIComponent() {
-  const status = useStore((state) => state.status);
+  const snapshot = useSnapshot(state);
 
   const showUI = () => {
-    switch (status) {
-      case Status.Menu:
+    switch (snapshot.gameState) {
+      case GameState.Menu:
         return (
           <>
             <h1>Blackjack!</h1>
             <StartMenu />
           </>
         );
-      case Status.Betting:
+      case GameState.Betting:
         return <BankUI />;
       default:
         return (

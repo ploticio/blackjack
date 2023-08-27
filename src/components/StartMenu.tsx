@@ -1,14 +1,14 @@
-import { useStore, Status } from "../store/store";
+import { GameState, state } from "../store/store";
 
 export default function StartMenu() {
-  const setStatus = useStore((state) => state.setStatus);
-  const shuffle = useStore((state) => state.shuffle);
-
   const handleGameStart = () => {
     for (let i = 0; i < 10; i++) {
-      shuffle();
+      state.shoe = state.shoe
+        .map((card) => ({ card, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ card }) => card);
     }
-    setStatus(Status.Betting);
+    state.gameState = GameState.Betting;
   };
 
   return (
