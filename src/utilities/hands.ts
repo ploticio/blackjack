@@ -4,6 +4,7 @@ import { Card, back_card } from "./cards";
 export enum Status {
   Playing = "Playing",
   Standing = "Standing",
+  Standby = "Standby",
   Win = "Win!",
   Bust = "Bust!",
   Loss = "Loss!",
@@ -16,18 +17,18 @@ export class Hand {
 
   constructor() {
     this.cards = [];
-    this._status = Status.Playing;
+    this._status = Status.Standby;
   }
 
   set status(status: Status) {
     this._status = status;
   }
 
-  get status() {
+  get status(): Status {
     return this._status;
   }
 
-  getSum() {
+  getSum(): { hardTotal: number; softTotal: number } {
     const hardTotal = this.cards.reduce((acc, card) => acc + card.value, 0);
     let softTotal = hardTotal;
     if (this.cards.some((card) => card.value === 1)) {
@@ -47,17 +48,10 @@ export class Hand {
     this.cards.push(card);
   }
 
-  removeEnd() {
-    if (this.cards.length) {
-      return this.cards.pop()!;
-    }
-    return {} as Card;
-  }
-
   resetHand() {
     state.discarded = [...state.discarded, ...this.cards];
     this.cards = [];
-    this.status = Status.Playing;
+    this.status = Status.Standby;
   }
 }
 
@@ -92,7 +86,7 @@ export class DealerHand {
     this._blackjack = false;
   }
 
-  checkBlackjack() {
+  checkBlackjack(): boolean {
     if (
       this.hand.cards.length === 2 &&
       ((this.hand.cards[0].value === 1 && this._holeCard.value === 10) ||
@@ -100,9 +94,10 @@ export class DealerHand {
     ) {
       this._blackjack = true;
     }
+    return this._blackjack;
   }
 
-  get blackjack() {
+  get blackjack(): boolean {
     return this._blackjack;
   }
 }
@@ -122,7 +117,7 @@ export class PlayerHand {
     this._bet = amount;
   }
 
-  get bet() {
+  get bet(): number {
     return this._bet;
   }
 
@@ -132,12 +127,20 @@ export class PlayerHand {
     this._blackjack = false;
   }
 
-  checkBlackjack() {
+  checkBlackjack(): boolean {
     if (this.hand.cards.length === 2 && this.hand.getSum().softTotal == 21) this._blackjack = true;
+    return this._blackjack;
   }
 
-  get blackjack() {
+  get blackjack(): boolean {
     return this._blackjack;
+  }
+
+  removeEnd() {
+    if (this.hand.cards.length) {
+      return this.hand.cards.pop()!;
+    }
+    return {} as Card;
   }
 }
 

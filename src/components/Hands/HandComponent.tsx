@@ -7,10 +7,10 @@ import { Status } from "../../utilities/hands";
 interface IProps {
   cards: readonly Card[];
   status?: Status;
-  showStatus: boolean;
+  showStatus?: boolean;
 }
 
-export default function HandComponent({ cards, status, showStatus }: IProps) {
+export default function HandComponent({ cards, status, showStatus = true }: IProps) {
   const getSum = () => {
     const hardTotal = cards.reduce((acc, card) => acc + card.value, 0);
     let softTotal = hardTotal;

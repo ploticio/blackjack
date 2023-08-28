@@ -10,17 +10,9 @@ export default function PlayerHand() {
     <div>
       <h1>Player</h1>
       <div className="hand-container">
-        <HandComponent
-          cards={snapshot.playerHand.hand.cards}
-          status={snapshot.playerHand.hand.status}
-          showStatus={true}
-        />
+        <HandComponent cards={snapshot.playerHand.hand.cards} status={snapshot.playerHand.hand.status} />
         {snapshot.splitHand.hand.cards.length > 0 && (
-          <HandComponent
-            cards={snapshot.splitHand.hand.cards}
-            status={snapshot.splitHand.hand.status}
-            showStatus={true}
-          />
+          <HandComponent cards={snapshot.splitHand.hand.cards} status={snapshot.splitHand.hand.status} />
         )}
       </div>
     </div>

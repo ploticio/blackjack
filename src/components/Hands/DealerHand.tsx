@@ -8,11 +8,7 @@ export default function DealerHand() {
   return (
     <>
       <h1>Dealer</h1>
-      <HandComponent
-        cards={snapshot.dealerHand.hand.cards}
-        status={snapshot.dealerHand.hand.status}
-        showStatus={false}
-      />
+      <HandComponent cards={snapshot.dealerHand.hand.cards} />
     </>
   );
 }
