@@ -145,7 +145,11 @@ export default function Controls() {
     state.playerHand.resetHand();
     state.splitHand.resetHand();
     handleEarnings();
-    state.gameState = GameState.Betting;
+    if (state.bank <= 0) state.gameState = GameState.Gameover;
+    else {
+      if (state.shoe.length < 52) handleShuffle();
+      state.gameState = GameState.Betting;
+    }
   };
 
   const handleEarnings = () => {
@@ -163,6 +167,17 @@ export default function Controls() {
     } else if (snapshot.splitHand.hand.status === Status.Loss || snapshot.splitHand.hand.status === Status.Bust)
       earnings -= snapshot.splitHand.bet;
     state.bank += earnings;
+  };
+
+  const handleShuffle = () => {
+    state.shoe = [...state.shoe, ...state.discarded];
+    state.discarded = [];
+    for (let i = 0; i < 10; i++) {
+      state.shoe = state.shoe
+        .map((card) => ({ card, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ card }) => card);
+    }
   };
 
   const switchIfSplit = () => {

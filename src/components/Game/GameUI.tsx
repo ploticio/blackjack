@@ -1,5 +1,5 @@
 import Controls from "./Controls";
-import HandsDisplay from "./HandsDisplay";
+import HandsDisplay from "../Hands/HandsDisplay";
 
 export default function GameUI() {
   return (

@@ -47,13 +47,13 @@ export default function BankControls() {
 
   return (
     <>
-      <button onClick={() => handleChangeBet(1)}>+1</button>
       <button onClick={() => handleChangeBet(5)}>+5</button>
+      <button onClick={() => handleChangeBet(10)}>+10</button>
       <button onClick={() => handleChangeBet(25)}>+25</button>
       <button onClick={() => handleChangeBet(50)}>+50</button>
       <button onClick={() => handleChangeBet(100)}>+100</button>
       <button onClick={() => (state.bet = 0)}>Reset</button>
-      <button onClick={() => handleSubmit()}>Submit Bet</button>
+      {snapshot.bet > 0 && <button onClick={() => handleSubmit()}>Submit Bet</button>}
     </>
   );
 }

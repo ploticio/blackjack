@@ -1,5 +1,5 @@
-import DealerHand from "../Hands/DealerHand";
-import PlayerHand from "../Hands/PlayerHand";
+import DealerHand from "./DealerHand";
+import PlayerHand from "./PlayerHand";
 
 export default function HandsDisplay() {
   return (

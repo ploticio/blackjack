@@ -8,6 +8,7 @@ export enum GameState {
   Menu = "Menu",
   Betting = "Betting",
   Playing = "Playing",
+  Gameover = "Gameover",
 }
 
 interface IState {

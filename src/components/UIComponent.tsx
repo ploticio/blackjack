@@ -3,6 +3,7 @@ import GameUI from "./Game/GameUI";
 import BankUI from "./Bank/BankUI";
 import { useSnapshot } from "valtio";
 import { state, GameState } from "../store/store";
+import GameOver from "./Game/GameOverScreen";
 
 export default function UIComponent() {
   const snapshot = useSnapshot(state);
@@ -18,12 +19,10 @@ export default function UIComponent() {
         );
       case GameState.Betting:
         return <BankUI />;
+      case GameState.Gameover:
+        return <GameOver />;
       default:
-        return (
-          <>
-            <GameUI />
-          </>
-        );
+        return <GameUI />;
     }
   };
 
