@@ -1,6 +1,7 @@
 import { useSnapshot } from "valtio";
 import { state, GameState } from "../../store/store";
 import { Status } from "../../utilities/hands";
+import { two_card } from "../../utilities/cards";
 
 export default function BankControls() {
   const snapshot = useSnapshot(state);
@@ -39,10 +40,16 @@ function submitBet() {
 function initGame() {
   state.playerHand.hand.status = Status.Playing;
   state.dealerHand.hand.status = Status.Playing;
-  state.playerHand.hand.addRandom();
-  state.dealerHand.hand.addRandom();
-  state.playerHand.hand.addRandom();
-  state.dealerHand.addHoleCard();
+  // state.playerHand.hand.addRandom();
+  // state.dealerHand.hand.addRandom();
+  // state.playerHand.hand.addRandom();
+  // state.dealerHand.addHoleCard();
+
+  state.playerHand.hand.addToHand(two_card);
+  state.dealerHand.hand.addToHand(two_card);
+  state.playerHand.hand.addToHand(two_card);
+  state.dealerHand.addHoleCard(two_card);
+
   state.bet = 0;
   handleBlackjacks();
 }

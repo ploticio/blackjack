@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Status } from "../../utilities/hands";
 
 interface IProps {
@@ -12,16 +13,24 @@ export default function HandSum({ sum, status }: IProps) {
     status === Status.Loss ||
     status === Status.Bust ||
     status === Status.Standing;
+  const [delayedNum, setDelayedNum] = useState(sum);
 
-  if (sum.hardTotal !== sum.softTotal && sum.softTotal <= 21) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDelayedNum(sum);
+    }, 500);
+    return () => clearTimeout(timer);
+  });
+
+  if (delayedNum.hardTotal !== delayedNum.softTotal && delayedNum.softTotal <= 21) {
     return ifOutcome ? (
-      <h2>Hand: {sum.softTotal}</h2>
+      <h2>Hand: {delayedNum.softTotal}</h2>
     ) : (
       <h2>
-        Hand: {sum.hardTotal} ({sum.softTotal})
+        Hand: {delayedNum.hardTotal} ({delayedNum.softTotal})
       </h2>
     );
   } else {
-    return <h2>Hand: {sum.hardTotal}</h2>;
+    return <h2>Hand: {delayedNum.hardTotal}</h2>;
   }
 }

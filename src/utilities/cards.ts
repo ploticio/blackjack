@@ -71,6 +71,7 @@ export interface Card {
 
 export const back_card: Card = { value: 0, suit: Suit.Club, image: card_back };
 export const ace_card: Card = { value: 1, suit: Suit.Club, image: ace_of_clubs };
+export const two_card: Card = { value: 2, suit: Suit.Club, image: two_of_clubs };
 export const ten_card: Card = { value: 10, suit: Suit.Club, image: ten_of_clubs };
 
 export const deck: Card[] = [
