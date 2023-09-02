@@ -1,4 +1,4 @@
-import { GameState, state } from "../../store/store";
+import { GameState, state } from "../store/store";
 
 export default function GameOver() {
   const handleRestart = () => {

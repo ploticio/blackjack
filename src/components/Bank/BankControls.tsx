@@ -2,6 +2,7 @@ import { useSnapshot } from "valtio";
 import { state, GameState } from "../../store/store";
 import { Status } from "../../utilities/hands";
 import { AppSettings } from "../AppSettings";
+// import { ace_card, two_card, ten_card } from "../../utilities/cards";
 
 export default function BankControls() {
   const snapshot = useSnapshot(state);
@@ -45,6 +46,11 @@ function initGame() {
   state.dealerHand.hand.addRandom();
   state.playerHand.hand.addRandom();
   state.dealerHand.addHoleCard();
+
+  // state.playerHand.hand.addToHand(two_card);
+  // state.dealerHand.hand.addToHand(two_card);
+  // state.playerHand.hand.addToHand(two_card);
+  // state.dealerHand.addHoleCard(two_card);
 
   state.bet = 0;
   handleBlackjacks();
