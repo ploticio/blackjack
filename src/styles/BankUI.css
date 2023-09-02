@@ -1,0 +1,11 @@
+.bank-ui h1 {
+  scale: 0.1;
+}
+
+.bank-ui button {
+  scale: 0.1;
+}
+
+#submit {
+  scale: 1;
+}

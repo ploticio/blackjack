@@ -6,7 +6,7 @@ import { animate } from "framer-motion";
 import { useEffect } from "react";
 // import { ace_card, two_card, ten_card } from "../../utilities/cards";
 
-export default function BankControls() {
+export default function BankControls({ exitAnimation }: { exitAnimation: () => Promise<void> }) {
   const snapshot = useSnapshot(state);
 
   const handleSubmit = () => {
@@ -35,8 +35,9 @@ export default function BankControls() {
     state.buffer = 0;
   });
 
-  function submitBet() {
+  async function submitBet() {
     state.playerHand.bet = state.bet;
+    await exitAnimation();
     state.gameState = GameState.Playing;
     initGame();
   }
@@ -94,7 +95,9 @@ export default function BankControls() {
       <button onClick={() => handleResetBet()}>Reset</button>
       {snapshot.bet > 0 && (
         <div>
-          <button onClick={() => handleSubmit()}>Submit Bet</button>
+          <button id="submit" onClick={() => handleSubmit()}>
+            Submit Bet
+          </button>
         </div>
       )}
     </>
