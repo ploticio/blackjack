@@ -1,7 +1,7 @@
 import { useSnapshot } from "valtio";
 import { state, GameState } from "../../store/store";
 import { Status } from "../../utilities/hands";
-import { two_card } from "../../utilities/cards";
+import { AppSettings } from "../AppSettings";
 
 export default function BankControls() {
   const snapshot = useSnapshot(state);
@@ -39,16 +39,12 @@ function submitBet() {
 
 function initGame() {
   state.playerHand.hand.status = Status.Playing;
-  state.dealerHand.hand.status = Status.Playing;
-  // state.playerHand.hand.addRandom();
-  // state.dealerHand.hand.addRandom();
-  // state.playerHand.hand.addRandom();
-  // state.dealerHand.addHoleCard();
+  state.dealerHand.hand.status = Status.Standby;
 
-  state.playerHand.hand.addToHand(two_card);
-  state.dealerHand.hand.addToHand(two_card);
-  state.playerHand.hand.addToHand(two_card);
-  state.dealerHand.addHoleCard(two_card);
+  state.playerHand.hand.addRandom();
+  state.dealerHand.hand.addRandom();
+  state.playerHand.hand.addRandom();
+  state.dealerHand.addHoleCard();
 
   state.bet = 0;
   handleBlackjacks();
@@ -59,15 +55,21 @@ function handleBlackjacks() {
   const pBlackjack = state.playerHand.checkBlackjack();
   const dBlackjack = state.dealerHand.checkBlackjack();
   if (pBlackjack && !dBlackjack) {
-    state.dealerHand.flipCard();
+    setTimeout(() => {
+      state.dealerHand.flipCard();
+    }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 1000);
     state.dealerHand.hand.status = Status.Loss;
     state.playerHand.hand.status = Status.Win;
   } else if (!pBlackjack && dBlackjack) {
-    state.dealerHand.flipCard();
+    setTimeout(() => {
+      state.dealerHand.flipCard();
+    }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 350);
     state.dealerHand.hand.status = Status.Win;
     state.playerHand.hand.status = Status.Loss;
   } else if (pBlackjack && dBlackjack) {
-    state.dealerHand.flipCard();
+    setTimeout(() => {
+      state.dealerHand.flipCard();
+    }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 350);
     state.dealerHand.hand.status = Status.Push;
     state.playerHand.hand.status = Status.Push;
   }

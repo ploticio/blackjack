@@ -3,7 +3,7 @@ import CardComponent from "../Game/CardComponent";
 import HandSum from "./HandSum";
 import { Card } from "../../utilities/cards";
 import { Status } from "../../utilities/hands";
-import { Variants, motion } from "framer-motion";
+import { AnimatePresence, Variants, motion } from "framer-motion";
 import { AppSettings } from "../AppSettings";
 
 interface IProps {
@@ -12,20 +12,19 @@ interface IProps {
   showStatus?: boolean;
 }
 
-const containerVariant: Variants = {
-  visible: { transition: { staggerChildren: AppSettings.ADD_CARD_SPEED } },
-};
-
 const cardAnimation: Variants = {
   hidden: { x: "-100vw", y: "-10vh" },
+  flipHidden: { rotateY: -90, transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED } },
   visible: { x: 0, y: 0, transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED } },
-  leave: { x: "-100vw", y: "-10vh", transition: { type: "tween", duration: 0.2 } },
+  flipVisible: { rotateY: 0.01, transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED } },
+  leave: { x: "-100vw", y: "-10vh", transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED } },
+  flipLeave: { rotateY: 90, transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED / 2 } },
 };
 
 const statusAnimation: Variants = {
   hidden: { y: "10vh", opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { type: "tween", delay: 0.5 } },
-  leave: { y: "10vh", opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { type: "tween", delay: 0.75 } },
+  // leave: { y: "10vh", opacity: 0 },
 };
 
 export default function HandComponent({ cards, status, showStatus = true }: IProps) {
@@ -42,7 +41,7 @@ export default function HandComponent({ cards, status, showStatus = true }: IPro
   };
 
   return (
-    <div className="hand-data">
+    <div>
       {showStatus &&
         (status === "Win!" || status === "Bust!" || status === "Loss!" || status === "Push!" ? (
           <motion.h1 variants={statusAnimation} initial="hidden" animate="visible">
@@ -51,22 +50,31 @@ export default function HandComponent({ cards, status, showStatus = true }: IPro
         ) : (
           <h1>‎</h1>
         ))}
-      <motion.div
-        layout="position"
-        className="hand"
-        variants={containerVariant}
-        initial="hidden"
-        animate="visible"
-        exit="leave"
-      >
-        {cards.length > 0 &&
-          cards.map((card, index) => (
-            <motion.div key={index} variants={cardAnimation}>
-              <CardComponent key={index} card={card} />
-            </motion.div>
-          ))}
+      <motion.div layout="position" className="hand">
+        <AnimatePresence>
+          {cards.length > 0 &&
+            cards.map((card, index) => (
+              <motion.div
+                key={index}
+                variants={cardAnimation}
+                initial={
+                  !showStatus && (status === Status.Standing || status === Status.Win || status === Status.Loss)
+                    ? "flipHidden"
+                    : "hidden"
+                }
+                animate={
+                  !showStatus && (status === Status.Standing || status === Status.Win || status === Status.Loss)
+                    ? "flipVisible"
+                    : "visible"
+                }
+                exit="flipLeave"
+              >
+                <CardComponent key={index} card={card} />
+              </motion.div>
+            ))}
+        </AnimatePresence>
       </motion.div>
-      <HandSum sum={getSum()} status={status} />
+      <HandSum sum={getSum()} status={status} showStatus={showStatus} />
     </div>
   );
 }

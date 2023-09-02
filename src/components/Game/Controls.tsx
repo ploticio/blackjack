@@ -2,6 +2,7 @@ import { useSnapshot } from "valtio";
 import { GameState, state } from "../../store/store";
 import { Status } from "../../utilities/hands";
 import { useEffect, useRef } from "react";
+import { AppSettings } from "../AppSettings";
 
 export default function Controls() {
   const snapshot = useSnapshot(state);
@@ -41,10 +42,14 @@ export default function Controls() {
       // End round if player busts and splithand is a blackjack
       else if (state.splitHand.hand.status === Status.Win) {
         state.dealerHand.hand.status = Status.Loss;
-        state.dealerHand.flipCard();
+        setTimeout(() => {
+          state.dealerHand.flipCard();
+        }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 1000);
       } else {
         state.dealerHand.hand.status = Status.Win;
-        state.dealerHand.flipCard();
+        setTimeout(() => {
+          state.dealerHand.flipCard();
+        }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 1000);
       }
     }
   }
@@ -80,10 +85,14 @@ export default function Controls() {
       // Set playerhand to Standing if not already a blackjack/bust (accounts for split hand situations)
       if (state.playerHand.hand.status !== Status.Bust && state.playerHand.hand.status !== Status.Win)
         state.playerHand.hand.status = Status.Standing;
+      state.dealerHand.hand.status = Status.Standing;
       state.dealerHand.flipCard();
-      timerId.current = setInterval(() => {
-        state.dealerHand.hand.addRandom();
-      }, 1000);
+      // Wait for cardflip before adding cards
+      setTimeout(() => {
+        timerId.current = setInterval(() => {
+          state.dealerHand.hand.addRandom();
+        }, AppSettings.ADD_CARD_SPEED * 1000 + 100);
+      }, 500);
     }
   }
 
@@ -93,13 +102,13 @@ export default function Controls() {
       state.dealerHand.hand.getSum().hardTotal >= 17
     ) {
       clearInterval(timerId.current);
-      state.dealerHand.hand.status = Status.Standing;
       // Check for dealer bust
       if (state.dealerHand.hand.getSum().hardTotal > 21) {
         state.dealerHand.hand.status = Status.Bust;
         if (state.playerHand.hand.status === Status.Standing) state.playerHand.hand.status = Status.Win;
         if (state.splitHand.hand.status === Status.Standing) state.splitHand.hand.status = Status.Win;
       } else {
+        state.dealerHand.hand.status = Status.Standing;
         const dSum =
           state.dealerHand.hand.getSum().softTotal <= 21
             ? state.dealerHand.hand.getSum().softTotal
@@ -133,12 +142,16 @@ export default function Controls() {
       state.splitHand.bet *= 2;
       hitSplitHand();
       // Prevent possiblity of stand() more than once
-      if (state.splitHand.hand.getSum().hardTotal <= 21) stand();
+      setTimeout(() => {
+        if (state.splitHand.hand.getSum().hardTotal <= 21) stand();
+      }, 500);
     } else {
       state.playerHand.bet *= 2;
       hitPlayerHand();
       // Prevent possiblity of stand() more than once
-      if (state.playerHand.hand.getSum().hardTotal <= 21) stand();
+      setTimeout(() => {
+        if (state.playerHand.hand.getSum().hardTotal <= 21) stand();
+      }, 1000);
     }
   }
 
