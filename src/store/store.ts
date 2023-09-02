@@ -21,6 +21,7 @@ interface IState {
   startScreen: boolean;
   bank: number;
   bet: number;
+  buffer: number;
 }
 
 export const state = proxy<IState>({
@@ -33,6 +34,7 @@ export const state = proxy<IState>({
   startScreen: true,
   bank: 1000,
   bet: 0,
+  buffer: 0,
 });
 
 const unsub = devtools(state, { name: "myState", enabled: true });
