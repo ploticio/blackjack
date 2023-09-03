@@ -3,6 +3,7 @@ import HandsDisplay from "../Hands/HandsDisplay";
 import usePlayerAnimations from "../../hooks/usePlayerAnimations";
 import useDealerAnimations from "../../hooks/useDealerAnimations";
 import useSplitAnimations from "../../hooks/useSplitAnimations";
+import Preloader from "../Hands/Preloader";
 
 export default function GameUI() {
   const {
@@ -33,6 +34,7 @@ export default function GameUI() {
         renderPlayerCardsAnimation={renderPlayerCardsAnimation}
         renderDealerCardsAnimation={renderDealerCardsAnimation}
       />
+      <Preloader />
       <Controls
         playerEnterAnimation={playerEnterAnimation}
         playerExitAnimation={playerExitAnimation}

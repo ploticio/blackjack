@@ -88,13 +88,13 @@ export default function Controls({
       if (state.splitHand.hand.status === Status.Standing) stand();
       // End round if player busts and splithand is a blackjack
       else if (state.splitHand.hand.status === Status.Win) {
-        state.dealerHand.hand.status = Status.Loss;
         await dealerFlip();
+        state.dealerHand.hand.status = Status.Loss;
       }
       // Else player loses, end round
       else {
-        state.dealerHand.hand.status = Status.Win;
         await dealerFlip();
+        state.dealerHand.hand.status = Status.Win;
       }
     }
   }
@@ -224,10 +224,10 @@ export default function Controls({
       // Check for double blackjack
       state.playerHand.checkBlackjack();
       if (state.playerHand.blackjack) {
-        state.playerHand.hand.status = Status.Win;
-        state.dealerHand.hand.status = Status.Loss;
         await timeout(1000);
         await dealerFlip();
+        state.playerHand.hand.status = Status.Win;
+        state.dealerHand.hand.status = Status.Loss;
       }
     }
   }
