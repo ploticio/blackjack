@@ -1,80 +1,43 @@
 import "../../styles/HandComponent.css";
-import CardComponent from "../Game/CardComponent";
 import HandSum from "./HandSum";
 import { Card } from "../../utilities/cards";
 import { Status } from "../../utilities/hands";
-import { AnimatePresence, Variants, motion } from "framer-motion";
-import { AppSettings } from "../AppSettings";
+import { AnimationScope, motion } from "framer-motion";
+import { useEffect } from "react";
 
 interface IProps {
   cards: readonly Card[];
+  sum: { hardTotal: number; softTotal: number };
+  scope?: AnimationScope;
+  renderPlayerCardsAnimation?: () => Promise<void>;
+  renderDealerCardsAnimation?: () => Promise<void>;
   status?: Status;
   showStatus?: boolean;
 }
 
-const cardAnimation: Variants = {
-  hidden: { x: "-100vw", y: "-10vh" },
-  flipHidden: { rotateY: -90, transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED } },
-  visible: { x: 0, y: 0, transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED } },
-  flipVisible: { rotateY: 0.01, transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED } },
-  leave: { x: "-100vw", y: "-10vh", transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED } },
-  flipLeave: { rotateY: 90, transition: { type: "tween", duration: AppSettings.ADD_CARD_SPEED / 2 } },
-};
-
-const statusAnimation: Variants = {
-  hidden: { y: "10vh", opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { type: "tween", delay: 0.75 } },
-  // leave: { y: "10vh", opacity: 0 },
-};
-
-export default function HandComponent({ cards, status, showStatus = true }: IProps) {
-  const getSum = () => {
-    const hardTotal = cards.reduce((acc, card) => acc + card.value, 0);
-    let softTotal = hardTotal;
-    if (cards.some((card) => card.value === 1)) {
-      softTotal = hardTotal + 10;
-    }
-    return {
-      hardTotal,
-      softTotal,
-    };
-  };
+export default function HandComponent({
+  cards,
+  status,
+  showStatus = true,
+  sum,
+  scope,
+  renderPlayerCardsAnimation,
+  renderDealerCardsAnimation,
+}: IProps) {
+  useEffect(() => {
+    if (renderPlayerCardsAnimation) renderPlayerCardsAnimation();
+    else if (renderDealerCardsAnimation) renderDealerCardsAnimation();
+  }, []);
 
   return (
     <div>
-      {showStatus &&
-        (status === "Win!" || status === "Bust!" || status === "Loss!" || status === "Push!" ? (
-          <motion.h1 variants={statusAnimation} initial="hidden" animate="visible">
-            {status}
-          </motion.h1>
-        ) : (
-          <h1>‎</h1>
-        ))}
-      <motion.div layout="position" className="hand">
-        <AnimatePresence>
-          {cards.length > 0 &&
-            cards.map((card, index) => (
-              <motion.div
-                key={index}
-                variants={cardAnimation}
-                initial={
-                  !showStatus && (status === Status.Standing || status === Status.Win || status === Status.Loss)
-                    ? "flipHidden"
-                    : "hidden"
-                }
-                animate={
-                  !showStatus && (status === Status.Standing || status === Status.Win || status === Status.Loss)
-                    ? "flipVisible"
-                    : "visible"
-                }
-                exit="flipLeave"
-              >
-                <CardComponent key={index} card={card} />
-              </motion.div>
-            ))}
-        </AnimatePresence>
+      {showStatus && (status === "Win!" || status === "Bust!" || status === "Loss!" || status === "Push!") && (
+        <h1>{status}</h1>
+      )}
+      <motion.div layout="position" ref={scope} className="hand">
+        {cards.length > 0 && cards.map((card, index) => <img key={index} src={card.image} />)}
       </motion.div>
-      <HandSum sum={getSum()} status={status} showStatus={showStatus} />
+      <HandSum sum={sum} status={status} showStatus={showStatus} />
     </div>
   );
 }

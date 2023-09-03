@@ -4,3 +4,10 @@
   gap: 200px;
   align-items: flex-end;
 }
+
+.hands-display {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 85vh;
+}

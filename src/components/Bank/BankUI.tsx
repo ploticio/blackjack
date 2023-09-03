@@ -8,10 +8,10 @@ export default function BankUI() {
   const [scope, animate] = useAnimate();
 
   useEffect(() => {
-    enterAnimation();
+    enterAnimation2();
   });
 
-  const enterAnimation = async () => {
+  const enterAnimation2 = async () => {
     animate("h1", { scale: 10 });
     animate("button", { scale: 10 });
   };

@@ -1,13 +1,32 @@
 import { useSnapshot } from "valtio";
 import { GameState, state } from "../../store/store";
 import { Status } from "../../utilities/hands";
-import { useEffect, useRef } from "react";
-import { AppSettings } from "../AppSettings";
+import { useEffect } from "react";
 
-export default function Controls() {
+interface Props {
+  playerEnterAnimation: () => Promise<void>;
+  playerExitAnimation: () => Promise<void>;
+  playerSplitAnimation: () => Promise<void>;
+  dealerEnterAnimation: () => Promise<void>;
+  dealerExitAnimation: () => Promise<void>;
+  enterFlipAnimation: () => Promise<void>;
+  exitFlipAnimation: () => Promise<void>;
+  splitEnterAnimation: () => Promise<void>;
+  splitExitAnimation: () => Promise<void>;
+}
+
+export default function Controls({
+  playerEnterAnimation,
+  playerExitAnimation,
+  playerSplitAnimation,
+  dealerEnterAnimation,
+  dealerExitAnimation,
+  enterFlipAnimation,
+  exitFlipAnimation,
+  splitEnterAnimation,
+  splitExitAnimation,
+}: Props) {
   const snapshot = useSnapshot(state);
-  const timerId = useRef<number>();
-  const dealerSum = snapshot.dealerHand.hand.getSum().hardTotal;
 
   const handleHit = () => {
     hit();
@@ -25,43 +44,69 @@ export default function Controls() {
     split();
   };
 
-  const handleNewRound = () => {
+  useEffect(() => {
+    playerEnterAnimation();
+  }, [snapshot.playerHand.hand.cards]);
+
+  useEffect(() => {
+    dealerEnterAnimation();
+  }, [snapshot.dealerHand.hand.cards]);
+
+  useEffect(() => {
+    if (state.splitHand.hand.cards.length > 0) splitEnterAnimation();
+  }, [snapshot.splitHand.hand.cards]);
+
+  // Handle end of round
+  useEffect(() => {
+    if (
+      snapshot.dealerHand.hand.status === Status.Win ||
+      snapshot.dealerHand.hand.status === Status.Push ||
+      snapshot.dealerHand.hand.status === Status.Loss
+    ) {
+      handleNewRound();
+    }
+  }, [snapshot.dealerHand.hand.status]);
+
+  async function handleNewRound() {
+    playerExitAnimation();
+    if (snapshot.splitHand.hand.cards.length > 0) splitExitAnimation();
+    await dealerExitAnimation();
     resetRound();
-  };
+  }
 
   function hit() {
     if (state.splitHand.hand.status === Status.Playing) hitSplitHand();
     else hitPlayerHand();
   }
 
-  function hitPlayerHand() {
+  async function hitPlayerHand() {
     state.playerHand.hand.addRandom();
+    // state.playerHand.hand.addToHand(two_card);
+    await playerEnterAnimation();
     if (state.playerHand.hand.getSum().hardTotal > 21) {
       state.playerHand.hand.status = Status.Bust;
       if (state.splitHand.hand.status === Status.Standing) stand();
       // End round if player busts and splithand is a blackjack
       else if (state.splitHand.hand.status === Status.Win) {
         state.dealerHand.hand.status = Status.Loss;
-        setTimeout(() => {
-          state.dealerHand.flipCard();
-        }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 1000);
-      } else {
+        await dealerFlip();
+      }
+      // Else player loses, end round
+      else {
         state.dealerHand.hand.status = Status.Win;
-        setTimeout(() => {
-          state.dealerHand.flipCard();
-        }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 1000);
+        await dealerFlip();
       }
     }
   }
 
-  function hitSplitHand() {
+  async function hitSplitHand() {
     state.splitHand.hand.addRandom();
+    await splitEnterAnimation();
     if (state.splitHand.hand.getSum().hardTotal > 21) {
       state.splitHand.hand.status = Status.Bust;
       state.playerHand.hand.status = Status.Playing;
-      setTimeout(() => {
-        state.playerHand.hand.addRandom();
-      }, 1000);
+      state.playerHand.hand.addRandom();
+      await playerEnterAnimation();
       // Check if playerhand gets a blackjack after splithand busts
       state.playerHand.checkBlackjack();
       if (state.playerHand.blackjack) {
@@ -71,11 +116,12 @@ export default function Controls() {
     }
   }
 
-  function stand() {
+  async function stand() {
     if (state.splitHand.hand.status === Status.Playing) {
       state.splitHand.hand.status = Status.Standing;
       state.playerHand.hand.status = Status.Playing;
       state.playerHand.hand.addRandom();
+      await playerEnterAnimation();
       // Check if playerhand gets blackjack after splithand stands
       if (state.playerHand.checkBlackjack()) {
         state.playerHand.hand.status = Status.Win;
@@ -85,30 +131,21 @@ export default function Controls() {
       // Set playerhand to Standing if not already a blackjack/bust (accounts for split hand situations)
       if (state.playerHand.hand.status !== Status.Bust && state.playerHand.hand.status !== Status.Win)
         state.playerHand.hand.status = Status.Standing;
+      await dealerFlip();
+      while (
+        state.dealerHand.hand.getSum().softTotal < 17 ||
+        (state.dealerHand.hand.getSum().softTotal > 21 && state.dealerHand.hand.getSum().hardTotal < 17)
+      ) {
+        state.dealerHand.hand.addRandom();
+        await dealerEnterAnimation();
+      }
       state.dealerHand.hand.status = Status.Standing;
-      state.dealerHand.flipCard();
-      // Wait for cardflip before adding cards
-      setTimeout(() => {
-        timerId.current = setInterval(() => {
-          state.dealerHand.hand.addRandom();
-        }, AppSettings.ADD_CARD_SPEED * 1000 + 100);
-      }, 500);
-    }
-  }
-
-  useEffect(() => {
-    if (
-      (state.dealerHand.hand.getSum().softTotal >= 17 && state.dealerHand.hand.getSum().softTotal <= 21) ||
-      state.dealerHand.hand.getSum().hardTotal >= 17
-    ) {
-      clearInterval(timerId.current);
       // Check for dealer bust
       if (state.dealerHand.hand.getSum().hardTotal > 21) {
-        state.dealerHand.hand.status = Status.Bust;
+        state.dealerHand.hand.status = Status.Loss;
         if (state.playerHand.hand.status === Status.Standing) state.playerHand.hand.status = Status.Win;
         if (state.splitHand.hand.status === Status.Standing) state.splitHand.hand.status = Status.Win;
       } else {
-        state.dealerHand.hand.status = Status.Standing;
         const dSum =
           state.dealerHand.hand.getSum().softTotal <= 21
             ? state.dealerHand.hand.getSum().softTotal
@@ -119,9 +156,16 @@ export default function Controls() {
             state.playerHand.hand.getSum().softTotal <= 21
               ? state.playerHand.hand.getSum().softTotal
               : state.playerHand.hand.getSum().hardTotal;
-          if (pSum > dSum) state.playerHand.hand.status = Status.Win;
-          else if (pSum < dSum) state.playerHand.hand.status = Status.Loss;
-          else state.playerHand.hand.status = Status.Push;
+          if (pSum > dSum) {
+            state.playerHand.hand.status = Status.Win;
+            state.dealerHand.hand.status = Status.Loss;
+          } else if (pSum < dSum) {
+            state.playerHand.hand.status = Status.Loss;
+            state.dealerHand.hand.status = Status.Win;
+          } else {
+            state.playerHand.hand.status = Status.Push;
+            state.dealerHand.hand.status = Status.Push;
+          }
         }
         // Compare splithand if not already blackjack/busted
         if (state.splitHand.hand.status === Status.Standing) {
@@ -135,45 +179,55 @@ export default function Controls() {
         }
       }
     }
-  }, [dealerSum]);
+  }
 
-  function double() {
+  async function dealerFlip() {
+    await exitFlipAnimation();
+    state.dealerHand.hand.cards.pop();
+    state.dealerHand.hand.addToHand(state.dealerHand._holeCard);
+    await enterFlipAnimation();
+  }
+
+  async function double() {
     if (state.splitHand.hand.status === Status.Playing) {
       state.splitHand.bet *= 2;
-      hitSplitHand();
+      await hitSplitHand();
       // Prevent possiblity of stand() more than once
-      setTimeout(() => {
-        if (state.splitHand.hand.getSum().hardTotal <= 21) stand();
-      }, 500);
+      if (state.splitHand.hand.getSum().hardTotal <= 21) stand();
     } else {
       state.playerHand.bet *= 2;
-      hitPlayerHand();
+      await hitPlayerHand();
       // Prevent possiblity of stand() more than once
-      setTimeout(() => {
-        if (state.playerHand.hand.getSum().hardTotal <= 21) stand();
-      }, 1000);
+      if (state.playerHand.hand.getSum().hardTotal <= 21) stand();
     }
   }
 
-  function split() {
+  async function split() {
     state.playerHand.hand.status = Status.Standby;
     state.splitHand.hand.status = Status.Playing;
-    const temp = state.playerHand.removeEnd();
+    const temp = { ...state.playerHand.hand.cards[state.playerHand.hand.cards.length - 1] };
     state.splitHand.hand.addToHand(temp);
+    await playerSplitAnimation();
+    state.playerHand.removeEnd();
+    await splitEnterAnimation();
     state.splitHand.hand.addRandom();
+    await splitEnterAnimation();
     state.splitHand.bet = state.playerHand.bet;
     // Check for blackjack immediately after splitting
     state.splitHand.checkBlackjack();
     if (state.splitHand.blackjack) {
       state.splitHand.hand.status = Status.Win;
       state.playerHand.hand.status = Status.Playing;
+      await timeout(1000);
       state.playerHand.hand.addRandom();
+      await playerEnterAnimation();
       // Check for double blackjack
       state.playerHand.checkBlackjack();
       if (state.playerHand.blackjack) {
         state.playerHand.hand.status = Status.Win;
         state.dealerHand.hand.status = Status.Loss;
-        state.dealerHand.flipCard();
+        await timeout(1000);
+        await dealerFlip();
       }
     }
   }
@@ -218,6 +272,8 @@ export default function Controls() {
     }
   }
 
+  const timeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
   const canSplit =
     snapshot.splitHand.hand.status === Status.Standby &&
     snapshot.playerHand.hand.cards.length === 2 &&
@@ -240,9 +296,6 @@ export default function Controls() {
           {canDouble && <button onClick={() => handleDouble()}>Double</button>}
           {canSplit && <button onClick={() => handleSplit()}>Split</button>}
         </>
-      )}
-      {snapshot.playerHand.hand.status !== Status.Playing && (
-        <button onClick={() => handleNewRound()}>Reset Hands</button>
       )}
     </div>
   );

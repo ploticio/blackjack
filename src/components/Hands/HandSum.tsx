@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Status } from "../../utilities/hands";
+import { AnimationSettings } from "../../hooks/AnimationSettings";
 
 interface IProps {
   sum: { hardTotal: number; softTotal: number };
@@ -17,10 +18,9 @@ export default function HandSum({ sum, status, showStatus }: IProps) {
   const [delayedNum, setDelayedNum] = useState(sum);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    setTimeout(() => {
       setDelayedNum(sum);
-    }, 500);
-    return () => clearTimeout(timer);
+    }, AnimationSettings.CARD_DRAW_SPEED * 1000);
   });
 
   if (!showStatus) {

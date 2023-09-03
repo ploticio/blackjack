@@ -1,12 +1,14 @@
 import { useSnapshot } from "valtio";
 import { state, GameState } from "../../store/store";
 import { Status } from "../../utilities/hands";
-import { AppSettings } from "../AppSettings";
 import { animate } from "framer-motion";
 import { useEffect } from "react";
-// import { ace_card, two_card, ten_card } from "../../utilities/cards";
 
-export default function BankControls({ exitAnimation }: { exitAnimation: () => Promise<void> }) {
+interface Props {
+  exitAnimation: () => Promise<void>;
+}
+
+export default function BankControls({ exitAnimation }: Props) {
   const snapshot = useSnapshot(state);
 
   const handleSubmit = () => {
@@ -42,7 +44,7 @@ export default function BankControls({ exitAnimation }: { exitAnimation: () => P
     initGame();
   }
 
-  function initGame() {
+  async function initGame() {
     state.playerHand.hand.status = Status.Playing;
     state.dealerHand.hand.status = Status.Standby;
 
@@ -50,11 +52,6 @@ export default function BankControls({ exitAnimation }: { exitAnimation: () => P
     state.dealerHand.hand.addRandom();
     state.playerHand.hand.addRandom();
     state.dealerHand.addHoleCard();
-
-    // state.playerHand.hand.addToHand(two_card);
-    // state.dealerHand.hand.addToHand(two_card);
-    // state.playerHand.hand.addToHand(two_card);
-    // state.dealerHand.addHoleCard(two_card);
 
     state.bet = 0;
     handleBlackjacks();
@@ -67,19 +64,19 @@ export default function BankControls({ exitAnimation }: { exitAnimation: () => P
     if (pBlackjack && !dBlackjack) {
       setTimeout(() => {
         state.dealerHand.flipCard();
-      }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 1000);
+      }, 200);
       state.dealerHand.hand.status = Status.Loss;
       state.playerHand.hand.status = Status.Win;
     } else if (!pBlackjack && dBlackjack) {
       setTimeout(() => {
         state.dealerHand.flipCard();
-      }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 350);
+      }, 200);
       state.dealerHand.hand.status = Status.Win;
       state.playerHand.hand.status = Status.Loss;
     } else if (pBlackjack && dBlackjack) {
       setTimeout(() => {
         state.dealerHand.flipCard();
-      }, AppSettings.FLIP_CARD_OUTCOME_SPEED * 350);
+      }, 200);
       state.dealerHand.hand.status = Status.Push;
       state.playerHand.hand.status = Status.Push;
     }

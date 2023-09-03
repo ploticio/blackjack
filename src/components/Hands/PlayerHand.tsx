@@ -2,17 +2,34 @@ import "../../styles/PlayerHand.css";
 import HandComponent from "./HandComponent";
 import { state } from "../../store/store";
 import { useSnapshot } from "valtio";
+import { AnimationScope } from "framer-motion";
 
-export default function PlayerHand() {
+interface Props {
+  renderPlayerCardsAnimation: () => Promise<void>;
+  playerScope: AnimationScope;
+  splitScope: AnimationScope;
+}
+
+export default function PlayerHand({ playerScope, splitScope, renderPlayerCardsAnimation }: Props) {
   const snapshot = useSnapshot(state);
 
   return (
     <div>
-      <h1>Player</h1>
       <div className="hand-container">
-        <HandComponent cards={snapshot.playerHand.hand.cards} status={snapshot.playerHand.hand.status} />
+        <HandComponent
+          cards={snapshot.playerHand.hand.cards}
+          status={snapshot.playerHand.hand.status}
+          sum={snapshot.playerHand.hand.getSum()}
+          scope={playerScope}
+          renderPlayerCardsAnimation={renderPlayerCardsAnimation}
+        />
         {snapshot.splitHand.hand.cards.length > 0 && (
-          <HandComponent cards={snapshot.splitHand.hand.cards} status={snapshot.splitHand.hand.status} />
+          <HandComponent
+            cards={snapshot.splitHand.hand.cards}
+            status={snapshot.splitHand.hand.status}
+            sum={snapshot.splitHand.hand.getSum()}
+            scope={splitScope}
+          />
         )}
       </div>
     </div>

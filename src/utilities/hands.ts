@@ -1,4 +1,3 @@
-import { AppSettings } from "../components/AppSettings";
 import { state } from "../store/store";
 import { Card, back_card } from "./cards";
 
@@ -79,12 +78,7 @@ export class DealerHand {
 
   flipCard() {
     this.hand.cards.pop();
-    setTimeout(() => {
-      this.hand.addToHand(this._holeCard);
-    }, AppSettings.ADD_CARD_SPEED * 1000 - 250);
-    setTimeout(() => {
-      if (!this.blackjack) this.hand.status = Status.Playing;
-    }, AppSettings.ADD_CARD_SPEED * 1000 + 500);
+    this.hand.addToHand(this._holeCard);
   }
 
   resetHand() {
