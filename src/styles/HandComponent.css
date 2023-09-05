@@ -11,3 +11,7 @@ img {
   top: -100vh;
   left: -75vw;
 }
+
+.hand-sum {
+  scale: 0.01;
+}

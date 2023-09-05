@@ -6,41 +6,20 @@ import useSplitAnimations from "../../hooks/useSplitAnimations";
 import Preloader from "../Hands/Preloader";
 
 export default function GameUI() {
-  const {
-    scope: playerScope,
-    playerEnterAnimation,
-    playerExitAnimation,
-    playerSplitAnimation,
-    playerInitAnimation,
-  } = usePlayerAnimations();
+  const { scope: playerScope, playerAnimations } = usePlayerAnimations();
 
-  const {
-    scope: dealerScope,
-    dealerEnterAnimation,
-    dealerExitAnimation,
-    enterFlipAnimation,
-    exitFlipAnimation,
-    dealerInitAnimation,
-  } = useDealerAnimations();
+  const { scope: dealerScope, dealerAnimations } = useDealerAnimations();
 
-  const { scope: splitScope, splitEnterAnimation, splitExitAnimation } = useSplitAnimations();
+  const { scope: splitScope, splitAnimations } = useSplitAnimations();
 
   return (
     <>
       <HandsDisplay playerScope={playerScope} dealerScope={dealerScope} splitScope={splitScope} />
       <Preloader />
       <Controls
-        playerEnterAnimation={playerEnterAnimation}
-        playerExitAnimation={playerExitAnimation}
-        playerSplitAnimation={playerSplitAnimation}
-        dealerEnterAnimation={dealerEnterAnimation}
-        dealerExitAnimation={dealerExitAnimation}
-        enterFlipAnimation={enterFlipAnimation}
-        exitFlipAnimation={exitFlipAnimation}
-        splitEnterAnimation={splitEnterAnimation}
-        splitExitAnimation={splitExitAnimation}
-        playerInitAnimation={playerInitAnimation}
-        dealerInitAnimation={dealerInitAnimation}
+        playerAnimations={playerAnimations}
+        dealerAnimations={dealerAnimations}
+        splitAnimations={splitAnimations}
       />
     </>
   );

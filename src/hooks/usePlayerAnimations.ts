@@ -15,7 +15,8 @@ export default function usePlayerAnimations() {
   const playerExitAnimation = async () => {
     await animate(
       "img",
-      { y: "-100vh" },
+      // { x: "-75vw", y: "-100vh" },
+      { scale: 0.01 },
       { type: "tween", duration: AnimationSettings.CARD_EXIT_SPEED, delay: AnimationSettings.ROUND_END_TIMER }
     );
   };
@@ -32,11 +33,10 @@ export default function usePlayerAnimations() {
     );
   };
 
+  const playerAnimations = { playerEnterAnimation, playerExitAnimation, playerSplitAnimation, playerInitAnimation };
+
   return {
     scope,
-    playerEnterAnimation,
-    playerExitAnimation,
-    playerSplitAnimation,
-    playerInitAnimation,
+    playerAnimations,
   };
 }

@@ -15,10 +15,13 @@ export default function useSplitAnimations() {
   const splitExitAnimation = async () => {
     await animate(
       "img",
-      { y: "-100vh" },
+      // { x: "-75vw", y: "-100vh" },
+      { scale: 0.01 },
       { type: "tween", duration: AnimationSettings.CARD_EXIT_SPEED, delay: AnimationSettings.ROUND_END_TIMER }
     );
   };
 
-  return { scope, splitEnterAnimation, splitExitAnimation };
+  const splitAnimations = { splitEnterAnimation, splitExitAnimation };
+
+  return { scope, splitAnimations };
 }

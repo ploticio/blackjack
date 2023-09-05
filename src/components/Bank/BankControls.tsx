@@ -2,7 +2,6 @@ import { useSnapshot } from "valtio";
 import { state, GameState } from "../../store/store";
 import { Status } from "../../utilities/hands";
 import { animate } from "framer-motion";
-import { useEffect } from "react";
 
 interface Props {
   exitAnimation: () => Promise<void>;
@@ -16,7 +15,7 @@ export default function BankControls({ exitAnimation }: Props) {
   };
 
   const handleChangeBet = (amount: number) => {
-    if (state.bet < state.bank) {
+    if (state.bet + amount < state.bank) {
       state.bet = state.bet + amount;
       animate(state.buffer, state.bet, {
         duration: 1,
@@ -33,10 +32,6 @@ export default function BankControls({ exitAnimation }: Props) {
     });
   };
 
-  useEffect(() => {
-    state.buffer = 0;
-  });
-
   async function submitBet() {
     state.playerHand.bet = state.bet;
     await exitAnimation();
@@ -52,8 +47,6 @@ export default function BankControls({ exitAnimation }: Props) {
     state.dealerHand.hand.addRandom();
     state.playerHand.hand.addRandom();
     state.dealerHand.addHoleCard();
-
-    state.bet = 0;
   }
 
   return (

@@ -5,26 +5,29 @@ export default function useDealerAnimations() {
   const [scope, animate] = useAnimate();
 
   const dealerEnterAnimation = async () => {
-    await animate(
-      ":last-child",
-      { x: "75vw", y: "100vh" },
-      { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED }
-    );
+    const promiseTimeout = new Promise((resolve) => setTimeout(() => resolve(false), 4000));
+
+    // Prevents animation hanging that occurs randomly
+    await Promise.race([
+      promiseTimeout,
+      animate(":last-child", { x: "75vw", y: "100vh" }, { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED }),
+    ]);
   };
 
   const dealerExitAnimation = async () => {
     await animate(
       "img",
-      { y: "-100vh" },
+      // { x: "-75vw", y: "-100vh" },
+      { scale: 0.01 },
       { type: "tween", duration: AnimationSettings.CARD_EXIT_SPEED, delay: AnimationSettings.ROUND_END_TIMER }
     );
   };
 
   const enterFlipAnimation = async () => {
-    await animate(":last-child", { rotateY: 0 }, { duration: AnimationSettings.CARD_FLIP_SPEED });
+    await animate(":last-child", { rotateY: 0 }, { duration: AnimationSettings.CARD_DRAW_SPEED / 2 - 0.05 });
   };
   const exitFlipAnimation = async () => {
-    await animate(":last-child", { rotateY: -90 }, { duration: AnimationSettings.CARD_FLIP_SPEED - 0.05 });
+    await animate(":last-child", { rotateY: -90 }, { duration: AnimationSettings.CARD_DRAW_SPEED / 2 });
   };
 
   const dealerInitAnimation = async () => {
@@ -35,12 +38,16 @@ export default function useDealerAnimations() {
     );
   };
 
-  return {
-    scope,
+  const dealerAnimations = {
     dealerEnterAnimation,
     dealerExitAnimation,
-    dealerInitAnimation,
     enterFlipAnimation,
     exitFlipAnimation,
+    dealerInitAnimation,
+  };
+
+  return {
+    scope,
+    dealerAnimations,
   };
 }

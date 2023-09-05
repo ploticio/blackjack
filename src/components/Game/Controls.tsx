@@ -4,32 +4,32 @@ import { Status } from "../../utilities/hands";
 import { useEffect, useState } from "react";
 
 interface Props {
+  playerAnimations: PlayerAnimations;
+  splitAnimations: SplitAnimations;
+  dealerAnimations: DealerAnimations;
+}
+
+interface SplitAnimations {
+  splitEnterAnimation: () => Promise<void>;
+  splitExitAnimation: () => Promise<void>;
+}
+
+interface PlayerAnimations {
   playerEnterAnimation: () => Promise<void>;
   playerExitAnimation: () => Promise<void>;
   playerSplitAnimation: () => Promise<void>;
+  playerInitAnimation: () => Promise<void>;
+}
+
+interface DealerAnimations {
   dealerEnterAnimation: () => Promise<void>;
   dealerExitAnimation: () => Promise<void>;
   enterFlipAnimation: () => Promise<void>;
   exitFlipAnimation: () => Promise<void>;
-  splitEnterAnimation: () => Promise<void>;
-  splitExitAnimation: () => Promise<void>;
-  playerInitAnimation: () => Promise<void>;
   dealerInitAnimation: () => Promise<void>;
 }
 
-export default function Controls({
-  playerEnterAnimation,
-  playerExitAnimation,
-  playerSplitAnimation,
-  dealerEnterAnimation,
-  dealerExitAnimation,
-  enterFlipAnimation,
-  exitFlipAnimation,
-  splitEnterAnimation,
-  splitExitAnimation,
-  playerInitAnimation,
-  dealerInitAnimation,
-}: Props) {
+export default function Controls({ playerAnimations, splitAnimations, dealerAnimations }: Props) {
   const snapshot = useSnapshot(state);
   const [enableControls, setEnableControls] = useState(false);
 
@@ -51,20 +51,32 @@ export default function Controls({
 
   useEffect(() => {
     playAnimations();
-  }, [snapshot.playerHand.hand.cards, snapshot.dealerHand.hand.cards]);
+  }, []);
 
   useEffect(() => {
-    if (state.splitHand.hand.cards.length > 0) splitEnterAnimation();
-  }, [snapshot.splitHand.hand.cards]);
+    if (
+      snapshot.playerHand.hand.cards.length > 2 ||
+      snapshot.splitHand.hand.status === Status.Standing ||
+      snapshot.splitHand.hand.status === Status.Win ||
+      snapshot.splitHand.hand.status === Status.Bust
+    )
+      playerAnimations.playerEnterAnimation();
+  }, [snapshot.playerHand.hand.cards.length, snapshot.splitHand.hand.status]);
+
+  useEffect(() => {
+    if (snapshot.dealerHand.hand.cards.length > 2) dealerAnimations.dealerEnterAnimation();
+  }, [snapshot.dealerHand.hand.cards.length]);
+
+  useEffect(() => {
+    if (snapshot.splitHand.hand.cards.length > 0) splitAnimations.splitEnterAnimation();
+  }, [snapshot.splitHand.hand.cards.length]);
 
   async function playAnimations() {
-    if (snapshot.playerHand.hand.cards.length <= 2) await playerInitAnimation();
-    if (snapshot.dealerHand.hand.cards.length <= 2) await dealerInitAnimation();
-    if (snapshot.playerHand.hand.status === Status.Playing) await playerEnterAnimation();
-    await dealerEnterAnimation();
-    if (state.playerHand.hand.cards.length === 2 && state.dealerHand.hand.cards.length === 2) {
-      await handleBlackjacks();
-    }
+    await playerAnimations.playerInitAnimation();
+    await dealerAnimations.dealerInitAnimation();
+    await playerAnimations.playerEnterAnimation();
+    await dealerAnimations.dealerEnterAnimation();
+    await handleBlackjacks();
     setEnableControls(true);
   }
 
@@ -76,7 +88,7 @@ export default function Controls({
   async function hitPlayerHand() {
     state.playerHand.hand.addRandom();
     // state.playerHand.hand.addToHand(two_card);
-    await playerEnterAnimation();
+    await playerAnimations.playerEnterAnimation();
     if (state.playerHand.hand.getSum().hardTotal > 21) {
       state.playerHand.hand.status = Status.Bust;
       if (state.splitHand.hand.status === Status.Standing) stand();
@@ -97,12 +109,12 @@ export default function Controls({
 
   async function hitSplitHand() {
     state.splitHand.hand.addRandom();
-    await splitEnterAnimation();
+    await splitAnimations.splitEnterAnimation();
     if (state.splitHand.hand.getSum().hardTotal > 21) {
       state.splitHand.hand.status = Status.Bust;
       state.playerHand.hand.status = Status.Playing;
       state.playerHand.hand.addRandom();
-      await playerEnterAnimation();
+      await playerAnimations.playerEnterAnimation();
       // Check if playerhand gets a blackjack after splithand busts
       state.playerHand.checkBlackjack();
       if (state.playerHand.blackjack) {
@@ -117,7 +129,7 @@ export default function Controls({
       state.splitHand.hand.status = Status.Standing;
       state.playerHand.hand.status = Status.Playing;
       state.playerHand.hand.addRandom();
-      await playerEnterAnimation();
+      await playerAnimations.playerEnterAnimation();
       // Check if playerhand gets blackjack after splithand stands
       if (state.playerHand.checkBlackjack()) {
         state.playerHand.hand.status = Status.Win;
@@ -133,8 +145,7 @@ export default function Controls({
         (state.dealerHand.hand.getSum().softTotal > 21 && state.dealerHand.hand.getSum().hardTotal < 17)
       ) {
         state.dealerHand.hand.addRandom();
-        // state.dealerHand.hand.addToHand(two_card);
-        await dealerEnterAnimation();
+        await dealerAnimations.dealerEnterAnimation();
       }
       state.dealerHand.hand.status = Status.Standing;
       // Check for dealer bust
@@ -181,10 +192,10 @@ export default function Controls({
   }
 
   async function dealerFlip() {
-    await exitFlipAnimation();
+    await dealerAnimations.exitFlipAnimation();
     state.dealerHand.hand.cards.pop();
     state.dealerHand.hand.addToHand(state.dealerHand._holeCard);
-    await enterFlipAnimation();
+    await dealerAnimations.enterFlipAnimation();
   }
 
   async function double() {
@@ -206,11 +217,11 @@ export default function Controls({
     state.splitHand.hand.status = Status.Playing;
     const temp = { ...state.playerHand.hand.cards[state.playerHand.hand.cards.length - 1] };
     state.splitHand.hand.addToHand(temp);
-    await playerSplitAnimation();
+    await playerAnimations.playerSplitAnimation();
     state.playerHand.removeEnd();
-    await splitEnterAnimation();
+    await splitAnimations.splitEnterAnimation();
     state.splitHand.hand.addRandom();
-    await splitEnterAnimation();
+    await splitAnimations.splitEnterAnimation();
     state.splitHand.bet = state.playerHand.bet;
     // Check for blackjack immediately after splitting
     state.splitHand.checkBlackjack();
@@ -219,7 +230,7 @@ export default function Controls({
       state.playerHand.hand.status = Status.Playing;
       await timeout(1000);
       state.playerHand.hand.addRandom();
-      await playerEnterAnimation();
+      await playerAnimations.playerEnterAnimation();
       // Check for double blackjack
       state.playerHand.checkBlackjack();
       if (state.playerHand.blackjack) {
@@ -237,16 +248,19 @@ export default function Controls({
     const pBlackjack = state.playerHand.checkBlackjack();
     const dBlackjack = state.dealerHand.checkBlackjack();
     if (pBlackjack && !dBlackjack) {
+      await timeout(750);
       await dealerFlip();
       state.dealerHand.hand.status = Status.Loss;
       state.playerHand.hand.status = Status.Win;
       await handleNewRound();
     } else if (!pBlackjack && dBlackjack) {
+      await timeout(750);
       await dealerFlip();
       state.dealerHand.hand.status = Status.Win;
       state.playerHand.hand.status = Status.Loss;
       await handleNewRound();
     } else if (pBlackjack && dBlackjack) {
+      await timeout(750);
       await dealerFlip();
       state.dealerHand.hand.status = Status.Push;
       state.playerHand.hand.status = Status.Push;
@@ -255,9 +269,9 @@ export default function Controls({
   }
 
   async function handleNewRound() {
-    playerExitAnimation();
-    if (snapshot.splitHand.hand.cards.length > 0) splitExitAnimation();
-    await dealerExitAnimation();
+    playerAnimations.playerExitAnimation();
+    if (state.splitHand.hand.cards.length > 0) splitAnimations.splitExitAnimation();
+    await dealerAnimations.dealerExitAnimation();
     resetRound();
   }
 
@@ -269,6 +283,8 @@ export default function Controls({
     if (state.bank <= 0) state.gameState = GameState.Gameover;
     else {
       if (state.shoe.length < 52) handleShuffle();
+      state.bet = 0;
+      state.buffer = 0;
       state.gameState = GameState.Betting;
     }
   }
