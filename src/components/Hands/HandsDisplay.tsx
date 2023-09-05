@@ -4,28 +4,16 @@ import DealerHand from "./DealerHand";
 import PlayerHand from "./PlayerHand";
 
 interface Props {
-  renderPlayerCardsAnimation: () => Promise<void>;
-  renderDealerCardsAnimation: () => Promise<void>;
   playerScope: AnimationScope;
   dealerScope: AnimationScope;
   splitScope: AnimationScope;
 }
 
-export default function HandsDisplay({
-  playerScope,
-  dealerScope,
-  splitScope,
-  renderPlayerCardsAnimation,
-  renderDealerCardsAnimation,
-}: Props) {
+export default function HandsDisplay({ playerScope, dealerScope, splitScope }: Props) {
   return (
     <div className="hands-display">
-      <DealerHand scope={dealerScope} renderDealerCardsAnimation={renderDealerCardsAnimation} />
-      <PlayerHand
-        playerScope={playerScope}
-        splitScope={splitScope}
-        renderPlayerCardsAnimation={renderPlayerCardsAnimation}
-      />
+      <DealerHand scope={dealerScope} />
+      <PlayerHand playerScope={playerScope} splitScope={splitScope} />
     </div>
   );
 }

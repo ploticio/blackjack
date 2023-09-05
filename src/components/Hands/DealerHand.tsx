@@ -4,11 +4,10 @@ import HandComponent from "./HandComponent";
 import { AnimationScope } from "framer-motion";
 
 interface Props {
-  renderDealerCardsAnimation: () => Promise<void>;
   scope: AnimationScope;
 }
 
-export default function DealerHand({ scope, renderDealerCardsAnimation }: Props) {
+export default function DealerHand({ scope }: Props) {
   const snapshot = useSnapshot(state);
   return (
     <>
@@ -18,7 +17,6 @@ export default function DealerHand({ scope, renderDealerCardsAnimation }: Props)
         showStatus={false}
         sum={snapshot.dealerHand.hand.getSum()}
         scope={scope}
-        renderDealerCardsAnimation={renderDealerCardsAnimation}
       />
     </>
   );

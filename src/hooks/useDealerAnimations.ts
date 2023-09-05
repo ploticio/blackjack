@@ -27,15 +27,19 @@ export default function useDealerAnimations() {
     await animate(":last-child", { rotateY: -90 }, { duration: AnimationSettings.CARD_FLIP_SPEED - 0.05 });
   };
 
-  const renderDealerCardsAnimation = async () => {
-    await animate("img", { x: "75vw", y: "100vh" }, { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED });
+  const dealerInitAnimation = async () => {
+    await animate(
+      ":first-child",
+      { x: "75vw", y: "100vh" },
+      { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED }
+    );
   };
 
   return {
     scope,
     dealerEnterAnimation,
     dealerExitAnimation,
-    renderDealerCardsAnimation,
+    dealerInitAnimation,
     enterFlipAnimation,
     exitFlipAnimation,
   };

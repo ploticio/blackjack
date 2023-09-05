@@ -10,30 +10,24 @@ export default function GameUI() {
     scope: playerScope,
     playerEnterAnimation,
     playerExitAnimation,
-    renderPlayerCardsAnimation,
     playerSplitAnimation,
+    playerInitAnimation,
   } = usePlayerAnimations();
 
   const {
     scope: dealerScope,
     dealerEnterAnimation,
     dealerExitAnimation,
-    renderDealerCardsAnimation,
     enterFlipAnimation,
     exitFlipAnimation,
+    dealerInitAnimation,
   } = useDealerAnimations();
 
   const { scope: splitScope, splitEnterAnimation, splitExitAnimation } = useSplitAnimations();
 
   return (
     <>
-      <HandsDisplay
-        playerScope={playerScope}
-        dealerScope={dealerScope}
-        splitScope={splitScope}
-        renderPlayerCardsAnimation={renderPlayerCardsAnimation}
-        renderDealerCardsAnimation={renderDealerCardsAnimation}
-      />
+      <HandsDisplay playerScope={playerScope} dealerScope={dealerScope} splitScope={splitScope} />
       <Preloader />
       <Controls
         playerEnterAnimation={playerEnterAnimation}
@@ -45,6 +39,8 @@ export default function GameUI() {
         exitFlipAnimation={exitFlipAnimation}
         splitEnterAnimation={splitEnterAnimation}
         splitExitAnimation={splitExitAnimation}
+        playerInitAnimation={playerInitAnimation}
+        dealerInitAnimation={dealerInitAnimation}
       />
     </>
   );

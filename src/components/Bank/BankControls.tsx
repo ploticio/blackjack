@@ -54,32 +54,6 @@ export default function BankControls({ exitAnimation }: Props) {
     state.dealerHand.addHoleCard();
 
     state.bet = 0;
-    handleBlackjacks();
-  }
-
-  function handleBlackjacks() {
-    // Handle Blackjack at game start
-    const pBlackjack = state.playerHand.checkBlackjack();
-    const dBlackjack = state.dealerHand.checkBlackjack();
-    if (pBlackjack && !dBlackjack) {
-      setTimeout(() => {
-        state.dealerHand.flipCard();
-      }, 200);
-      state.dealerHand.hand.status = Status.Loss;
-      state.playerHand.hand.status = Status.Win;
-    } else if (!pBlackjack && dBlackjack) {
-      setTimeout(() => {
-        state.dealerHand.flipCard();
-      }, 200);
-      state.dealerHand.hand.status = Status.Win;
-      state.playerHand.hand.status = Status.Loss;
-    } else if (pBlackjack && dBlackjack) {
-      setTimeout(() => {
-        state.dealerHand.flipCard();
-      }, 200);
-      state.dealerHand.hand.status = Status.Push;
-      state.playerHand.hand.status = Status.Push;
-    }
   }
 
   return (

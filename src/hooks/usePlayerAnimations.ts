@@ -24,9 +24,19 @@ export default function usePlayerAnimations() {
     await animate(":last-child", { opacity: 0 }, { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED });
   };
 
-  const renderPlayerCardsAnimation = async () => {
-    await animate("img", { x: "75vw", y: "100vh" }, { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED });
+  const playerInitAnimation = async () => {
+    await animate(
+      ":first-child",
+      { x: "75vw", y: "100vh" },
+      { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED }
+    );
   };
 
-  return { scope, playerEnterAnimation, playerExitAnimation, playerSplitAnimation, renderPlayerCardsAnimation };
+  return {
+    scope,
+    playerEnterAnimation,
+    playerExitAnimation,
+    playerSplitAnimation,
+    playerInitAnimation,
+  };
 }

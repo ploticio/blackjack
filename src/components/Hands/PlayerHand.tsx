@@ -5,12 +5,11 @@ import { useSnapshot } from "valtio";
 import { AnimationScope } from "framer-motion";
 
 interface Props {
-  renderPlayerCardsAnimation: () => Promise<void>;
   playerScope: AnimationScope;
   splitScope: AnimationScope;
 }
 
-export default function PlayerHand({ playerScope, splitScope, renderPlayerCardsAnimation }: Props) {
+export default function PlayerHand({ playerScope, splitScope }: Props) {
   const snapshot = useSnapshot(state);
 
   return (
@@ -21,7 +20,6 @@ export default function PlayerHand({ playerScope, splitScope, renderPlayerCardsA
           status={snapshot.playerHand.hand.status}
           sum={snapshot.playerHand.hand.getSum()}
           scope={playerScope}
-          renderPlayerCardsAnimation={renderPlayerCardsAnimation}
         />
         {snapshot.splitHand.hand.cards.length > 0 && (
           <HandComponent
