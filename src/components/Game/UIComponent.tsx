@@ -1,8 +1,8 @@
 import StartMenu from "./StartMenu";
-import GameUI from "./Game/GameUI";
-import BankUI from "./Bank/BankUI";
+import GameUI from "./GameUI";
+import BankUI from "../Bank/BankUI";
 import { useSnapshot } from "valtio";
-import { state, GameState } from "../store/store";
+import { state, GameState } from "../../store/store";
 import GameOver from "./GameOverScreen";
 
 export default function UIComponent() {

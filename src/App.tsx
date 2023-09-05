@@ -1,5 +1,5 @@
 import "./App.css";
-import UIComponent from "./components/UIComponent";
+import UIComponent from "./components/Game/UIComponent";
 
 function App() {
   return (

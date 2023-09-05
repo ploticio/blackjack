@@ -13,8 +13,8 @@ export default function DealerHand({ scope }: Props) {
     <>
       <HandComponent
         cards={snapshot.dealerHand.hand.cards}
+        isDealer={true}
         status={snapshot.dealerHand.hand.status}
-        showStatus={false}
         sum={snapshot.dealerHand.hand.getSum()}
         scope={scope}
       />

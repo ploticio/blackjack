@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
-import { GameState, state } from "../store/store";
+import { GameState, state } from "../../store/store";
 import { useEffect } from "react";
-import "../styles/GameOverScreen.css";
+import "../../styles/GameOverScreen.css";
 
 export default function GameOver() {
   const [scope, animate] = useAnimate();

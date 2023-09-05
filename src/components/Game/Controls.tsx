@@ -2,11 +2,14 @@ import { useSnapshot } from "valtio";
 import { GameState, state } from "../../store/store";
 import { Status } from "../../utilities/hands";
 import { useEffect, useState } from "react";
+import { AnimationSettings } from "../../hooks/AnimationSettings";
 
 interface Props {
   playerAnimations: PlayerAnimations;
   splitAnimations: SplitAnimations;
   dealerAnimations: DealerAnimations;
+  overlayAnimations: OverlayAnimations;
+  setOverlayValue: (result: string) => void;
 }
 
 interface SplitAnimations {
@@ -29,7 +32,18 @@ interface DealerAnimations {
   dealerInitAnimation: () => Promise<void>;
 }
 
-export default function Controls({ playerAnimations, splitAnimations, dealerAnimations }: Props) {
+interface OverlayAnimations {
+  showOverlay: () => Promise<void>;
+  hideOverlay: () => Promise<void>;
+}
+
+export default function Controls({
+  playerAnimations,
+  splitAnimations,
+  dealerAnimations,
+  overlayAnimations,
+  setOverlayValue,
+}: Props) {
   const snapshot = useSnapshot(state);
   const [enableControls, setEnableControls] = useState(false);
 
@@ -91,18 +105,21 @@ export default function Controls({ playerAnimations, splitAnimations, dealerAnim
     await playerAnimations.playerEnterAnimation();
     if (state.playerHand.hand.getSum().hardTotal > 21) {
       state.playerHand.hand.status = Status.Bust;
-      if (state.splitHand.hand.status === Status.Standing) stand();
+      if (state.splitHand.hand.status === Status.Standing) {
+        await displayOverlay("Bust!");
+        stand();
+      }
       // End round if player busts and splithand is a blackjack
       else if (state.splitHand.hand.status === Status.Win) {
         await dealerFlip();
         state.dealerHand.hand.status = Status.Loss;
-        await handleNewRound();
+        await handleNewRound("Bust!");
       }
       // Else player loses, end round
       else {
         await dealerFlip();
         state.dealerHand.hand.status = Status.Win;
-        await handleNewRound();
+        await handleNewRound("Bust!");
       }
     }
   }
@@ -112,6 +129,7 @@ export default function Controls({ playerAnimations, splitAnimations, dealerAnim
     await splitAnimations.splitEnterAnimation();
     if (state.splitHand.hand.getSum().hardTotal > 21) {
       state.splitHand.hand.status = Status.Bust;
+      await displayOverlay("Bust!");
       state.playerHand.hand.status = Status.Playing;
       state.playerHand.hand.addRandom();
       await playerAnimations.playerEnterAnimation();
@@ -119,6 +137,7 @@ export default function Controls({ playerAnimations, splitAnimations, dealerAnim
       state.playerHand.checkBlackjack();
       if (state.playerHand.blackjack) {
         state.playerHand.hand.status = Status.Win;
+        await displayOverlay("Blackjack!");
         stand();
       }
     }
@@ -151,14 +170,37 @@ export default function Controls({ playerAnimations, splitAnimations, dealerAnim
       // Check for dealer bust
       if (state.dealerHand.hand.getSum().hardTotal > 21) {
         state.dealerHand.hand.status = Status.Loss;
-        if (state.playerHand.hand.status === Status.Standing) state.playerHand.hand.status = Status.Win;
-        if (state.splitHand.hand.status === Status.Standing) state.splitHand.hand.status = Status.Win;
+        if (state.splitHand.hand.status === Status.Standing) {
+          state.splitHand.hand.status = Status.Win;
+          await displayOverlay("Win!");
+        }
+        if (state.playerHand.hand.status === Status.Standing) {
+          state.playerHand.hand.status = Status.Win;
+          await displayOverlay("Win!");
+        }
         await handleNewRound();
       } else {
         const dSum =
           state.dealerHand.hand.getSum().softTotal <= 21
             ? state.dealerHand.hand.getSum().softTotal
             : state.dealerHand.hand.getSum().hardTotal;
+        // Compare splithand if not already blackjack/busted
+        if (state.splitHand.hand.status === Status.Standing) {
+          const sSum =
+            state.splitHand.hand.getSum().softTotal <= 21
+              ? state.splitHand.hand.getSum().softTotal
+              : state.splitHand.hand.getSum().hardTotal;
+          if (sSum > dSum) {
+            state.splitHand.hand.status = Status.Win;
+            await displayOverlay("Win!");
+          } else if (sSum < dSum) {
+            state.splitHand.hand.status = Status.Loss;
+            await displayOverlay("Loss!");
+          } else {
+            state.splitHand.hand.status = Status.Push;
+            await displayOverlay("Push!");
+          }
+        }
         // Compare playerhand if not already blackjack/busted
         if (state.playerHand.hand.status === Status.Standing) {
           const pSum =
@@ -168,25 +210,17 @@ export default function Controls({ playerAnimations, splitAnimations, dealerAnim
           if (pSum > dSum) {
             state.playerHand.hand.status = Status.Win;
             state.dealerHand.hand.status = Status.Loss;
+            await handleNewRound("Win!");
           } else if (pSum < dSum) {
             state.playerHand.hand.status = Status.Loss;
             state.dealerHand.hand.status = Status.Win;
+            await handleNewRound("Loss!");
           } else {
             state.playerHand.hand.status = Status.Push;
             state.dealerHand.hand.status = Status.Push;
+            await handleNewRound("Push!");
           }
-        }
-        // Compare splithand if not already blackjack/busted
-        if (state.splitHand.hand.status === Status.Standing) {
-          const sSum =
-            state.splitHand.hand.getSum().softTotal <= 21
-              ? state.splitHand.hand.getSum().softTotal
-              : state.splitHand.hand.getSum().hardTotal;
-          if (sSum > dSum) state.splitHand.hand.status = Status.Win;
-          else if (sSum < dSum) state.splitHand.hand.status = Status.Loss;
-          else state.splitHand.hand.status = Status.Push;
-        }
-        await handleNewRound();
+        } else await handleNewRound();
       }
     }
   }
@@ -228,17 +262,17 @@ export default function Controls({ playerAnimations, splitAnimations, dealerAnim
     if (state.splitHand.blackjack) {
       state.splitHand.hand.status = Status.Win;
       state.playerHand.hand.status = Status.Playing;
-      await timeout(1000);
+      await displayOverlay("Blackjack!");
       state.playerHand.hand.addRandom();
       await playerAnimations.playerEnterAnimation();
       // Check for double blackjack
       state.playerHand.checkBlackjack();
       if (state.playerHand.blackjack) {
-        await timeout(1000);
+        await timeout(AnimationSettings.BLACKJACK_DELAY);
         await dealerFlip();
         state.playerHand.hand.status = Status.Win;
         state.dealerHand.hand.status = Status.Loss;
-        await handleNewRound();
+        await handleNewRound("Blackjack!");
       }
     }
   }
@@ -248,43 +282,55 @@ export default function Controls({ playerAnimations, splitAnimations, dealerAnim
     const pBlackjack = state.playerHand.checkBlackjack();
     const dBlackjack = state.dealerHand.checkBlackjack();
     if (pBlackjack && !dBlackjack) {
-      await timeout(750);
+      await timeout(AnimationSettings.BLACKJACK_DELAY);
       await dealerFlip();
       state.dealerHand.hand.status = Status.Loss;
       state.playerHand.hand.status = Status.Win;
-      await handleNewRound();
+      await handleNewRound("Blackjack!");
     } else if (!pBlackjack && dBlackjack) {
-      await timeout(750);
+      await timeout(AnimationSettings.BLACKJACK_DELAY);
       await dealerFlip();
       state.dealerHand.hand.status = Status.Win;
       state.playerHand.hand.status = Status.Loss;
-      await handleNewRound();
+      await handleNewRound("Loss!");
     } else if (pBlackjack && dBlackjack) {
-      await timeout(750);
+      await timeout(AnimationSettings.BLACKJACK_DELAY);
       await dealerFlip();
       state.dealerHand.hand.status = Status.Push;
       state.playerHand.hand.status = Status.Push;
-      await handleNewRound();
+      await handleNewRound("Push!");
     }
   }
 
-  async function handleNewRound() {
+  async function handleNewRound(result?: string) {
+    if (result) await displayOverlay(result);
     playerAnimations.playerExitAnimation();
     if (state.splitHand.hand.cards.length > 0) splitAnimations.splitExitAnimation();
     await dealerAnimations.dealerExitAnimation();
     resetRound();
   }
 
-  function resetRound() {
+  async function displayOverlay(text: string) {
+    await timeout(AnimationSettings.OVERLAY_DELAY);
+    await setOverlayValue(text);
+    await overlayAnimations.showOverlay();
+    await timeout(AnimationSettings.OVERLAY_DURATION);
+    await overlayAnimations.hideOverlay();
+  }
+
+  async function resetRound() {
     handleEarnings();
     state.dealerHand.resetHand();
     state.playerHand.resetHand();
     state.splitHand.resetHand();
+    state.bet = 0;
+    state.buffer = 0;
     if (state.bank <= 0) state.gameState = GameState.Gameover;
     else {
-      if (state.shoe.length < 52) handleShuffle();
-      state.bet = 0;
-      state.buffer = 0;
+      if (state.shoe.length < 52) {
+        handleShuffle();
+        await displayOverlay("Shuffling Cards...");
+      }
       state.gameState = GameState.Betting;
     }
   }
@@ -317,12 +363,13 @@ export default function Controls({ playerAnimations, splitAnimations, dealerAnim
     }
   }
 
-  const timeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+  const timeout = (seconds: number) => new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 
   const canSplit =
     snapshot.splitHand.hand.status === Status.Standby &&
     snapshot.playerHand.hand.cards.length === 2 &&
-    snapshot.playerHand.hand.cards[0].value === snapshot.playerHand.hand.cards[1].value;
+    snapshot.playerHand.hand.cards[0].value === snapshot.playerHand.hand.cards[1].value &&
+    snapshot.bank >= snapshot.bet * 2;
 
   const canDouble =
     (snapshot.playerHand.hand.status === Status.Playing &&

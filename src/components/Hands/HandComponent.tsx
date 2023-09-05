@@ -7,21 +7,18 @@ import { AnimationScope, motion } from "framer-motion";
 interface IProps {
   cards: readonly Card[];
   sum: { hardTotal: number; softTotal: number };
-  scope?: AnimationScope;
+  scope: AnimationScope;
   status?: Status;
-  showStatus?: boolean;
+  isDealer?: boolean;
 }
 
-export default function HandComponent({ cards, status, showStatus = true, sum, scope }: IProps) {
+export default function HandComponent({ cards, status, isDealer = false, sum, scope }: IProps) {
   return (
     <div>
-      {showStatus && (status === "Win!" || status === "Bust!" || status === "Loss!" || status === "Push!") && (
-        <h1>{status}</h1>
-      )}
       <motion.div layout="position" ref={scope} className="hand">
         {cards.length > 0 && cards.map((card, index) => <img key={index} src={card.image} />)}
       </motion.div>
-      <HandSum sum={sum} status={status} showStatus={showStatus} />
+      <HandSum sum={sum} status={status} isDealer={isDealer} />
     </div>
   );
 }

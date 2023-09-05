@@ -15,7 +15,7 @@ export default function BankControls({ exitAnimation }: Props) {
   };
 
   const handleChangeBet = (amount: number) => {
-    if (state.bet + amount < state.bank) {
+    if (state.bet + amount <= state.bank) {
       state.bet = state.bet + amount;
       animate(state.buffer, state.bet, {
         duration: 1,

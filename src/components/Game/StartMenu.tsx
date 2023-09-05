@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { GameState, state } from "../store/store";
-import "../styles/StartMenu.css";
+import { GameState, state } from "../../store/store";
+import "../../styles/StartMenu.css";
 import { useAnimate } from "framer-motion";
 
 export default function StartMenu() {

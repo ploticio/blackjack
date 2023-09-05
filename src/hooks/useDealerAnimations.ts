@@ -5,13 +5,11 @@ export default function useDealerAnimations() {
   const [scope, animate] = useAnimate();
 
   const dealerEnterAnimation = async () => {
-    const promiseTimeout = new Promise((resolve) => setTimeout(() => resolve(false), 4000));
-
-    // Prevents animation hanging that occurs randomly
-    await Promise.race([
-      promiseTimeout,
-      animate(":last-child", { x: "75vw", y: "100vh" }, { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED }),
-    ]);
+    await animate(
+      ":last-child",
+      { x: "75vw", y: "100vh" },
+      { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED }
+    );
   };
 
   const dealerExitAnimation = async () => {
