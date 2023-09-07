@@ -1,5 +1,5 @@
 import type {} from "@redux-devtools/extension";
-import { devtools } from "valtio/utils";
+// import { devtools } from "valtio/utils";
 import { proxy } from "valtio";
 import { Card } from "../utilities/cards";
 import { DealerHand, PlayerHand } from "../utilities/hands";
@@ -45,4 +45,4 @@ export const state = proxy<IState>({
   standSeventeen: true,
 });
 
-const unsub = devtools(state, { name: "myState", enabled: true });
+// const unsub = devtools(state, { name: "myState", enabled: true });
