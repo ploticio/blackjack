@@ -1,8 +1,10 @@
-import "../../styles/HandComponent.css";
+import "../../styles/global.css";
 import { useEffect, useState } from "react";
 import { Status } from "../../utilities/hands";
 import { AppSettings } from "../../utilities/AppSettings";
 import { useAnimate } from "framer-motion";
+import { useSnapshot } from "valtio";
+import { state } from "../../store/store";
 
 interface IProps {
   sum: { hardTotal: number; softTotal: number };
@@ -11,6 +13,7 @@ interface IProps {
 }
 
 export default function HandSum({ sum, status, isDealer }: IProps) {
+  const snapshot = useSnapshot(state);
   const [delayedNum, setDelayedNum] = useState(sum);
   const [scope, animate] = useAnimate();
   const ifOutcome =
@@ -64,7 +67,7 @@ export default function HandSum({ sum, status, isDealer }: IProps) {
 
   return (
     <h2 ref={scope} className="hand-sum">
-      {result}
+      {snapshot.showSums && result}
     </h2>
   );
 }

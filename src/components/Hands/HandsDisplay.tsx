@@ -1,4 +1,4 @@
-import "../../styles/PlayerHand.css";
+import "../../styles/global.css";
 import { AnimationScope } from "framer-motion";
 import DealerHand from "./DealerHand";
 import PlayerHand from "./PlayerHand";

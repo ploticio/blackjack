@@ -25,7 +25,7 @@ export default function GameOver() {
     await exitAnimation();
     state.gameState = GameState.Menu;
     state.bank = AppSettings.STARTING_MONEY;
-    state.shoe = [...state.shoe, ...state.discarded];
+    state.shoe = [];
     state.discarded = [];
   };
 

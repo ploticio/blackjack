@@ -130,14 +130,16 @@ export default function BankControls({ exitAnimation, playCoinSound }: Props) {
       </Flex>
       <Flex gap="9">
         <Button style={{ cursor: "pointer" }} variant="ghost" onClick={() => handleResetBet()}>
-          <Text size="6">Reset</Text>
+          <Text weight="medium" size="6">
+            Reset
+          </Text>
         </Button>
         <Button
           style={{ cursor: "pointer" }}
           variant="ghost"
           onClick={() => handleChangeBet(snapshot.bank - snapshot.bet)}
         >
-          <Text size="6" asChild>
+          <Text weight="medium" size="6" asChild>
             <motion.span
               animate={{ rotate: [10, -10, 10] }}
               transition={{ duration: 3, ease: "easeInOut", repeat: Infinity }}
@@ -147,7 +149,9 @@ export default function BankControls({ exitAnimation, playCoinSound }: Props) {
           </Text>
         </Button>
         <Button style={{ cursor: "pointer" }} variant="ghost" id="submit" onClick={() => handleSubmit()}>
-          <Text size="6">Bet!</Text>
+          <Text weight="medium" size="6">
+            Bet!
+          </Text>
         </Button>
       </Flex>
     </Flex>

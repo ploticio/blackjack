@@ -11,4 +11,6 @@ export class AppSettings {
   static readonly STARTING_MONEY = 500;
   static readonly TITLE_EXIT_SPEED = 1;
   static readonly GAMEOVER_EXIT_SPEED = 0.75;
+
+  static readonly SHUFFLE_WHEN = 26;
 }

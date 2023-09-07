@@ -1,4 +1,4 @@
-import "../../styles/PlayerHand.css";
+import "../../styles/global.css";
 import HandComponent from "./HandComponent";
 import { state } from "../../store/store";
 import { useSnapshot } from "valtio";

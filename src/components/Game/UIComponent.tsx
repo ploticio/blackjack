@@ -1,4 +1,4 @@
-import StartMenu from "./StartMenu";
+import GameMenu from "./GameMenu";
 import GameUI from "./GameUI";
 import BankUI from "../Bank/BankUI";
 import GameOver from "./GameOverScreen";
@@ -23,7 +23,7 @@ export default function UIComponent() {
   const showUI = () => {
     switch (snapshot.gameState) {
       case GameState.Menu:
-        return <StartMenu />;
+        return <GameMenu />;
       case GameState.Betting:
         return <BankUI playCoinSound={playCoinSound} />;
       case GameState.Gameover:
@@ -37,7 +37,7 @@ export default function UIComponent() {
     <div>
       {showUI()}
       <Link href="https://github.com/ploticio/blackjack" target="_blank" rel="noopener noreferrer">
-        <Flex align="center" justify="center" style={{ position: "fixed", bottom: "2px", right: "4px" }}>
+        <Flex align="center" justify="center" style={{ position: "fixed", bottom: "2px", right: "8px" }}>
           <GitHubLogoIcon />
           <Text ml="1">Made by ploticio</Text>
         </Flex>

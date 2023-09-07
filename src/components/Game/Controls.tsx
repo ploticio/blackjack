@@ -343,7 +343,7 @@ export default function Controls({
     state.buffer = 0;
     if (state.bank <= 0) state.gameState = GameState.Gameover;
     else {
-      if (state.shoe.length < 52) {
+      if (state.shoe.length < AppSettings.SHUFFLE_WHEN) {
         handleShuffle();
         await displayOverlay("Shuffling Cards...");
       }

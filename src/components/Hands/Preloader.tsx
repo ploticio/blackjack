@@ -1,4 +1,3 @@
-import "../../styles/HandComponent.css";
 import { deck } from "../../utilities/cards";
 
 export default function Preloader() {

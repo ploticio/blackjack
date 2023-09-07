@@ -22,11 +22,13 @@ interface IState {
   bank: number;
   bet: number;
   buffer: number;
+  showSums: boolean;
+  numberDecks: number;
 }
 
 export const state = proxy<IState>({
   gameState: GameState.Menu,
-  shoe: [...deck, ...deck, ...deck, ...deck],
+  shoe: [],
   playerHand: new PlayerHand(),
   dealerHand: new DealerHand(),
   splitHand: new PlayerHand(),
@@ -35,6 +37,8 @@ export const state = proxy<IState>({
   bank: 500,
   bet: 0,
   buffer: 0,
+  showSums: true,
+  numberDecks: 4,
 });
 
 const unsub = devtools(state, { name: "myState", enabled: true });

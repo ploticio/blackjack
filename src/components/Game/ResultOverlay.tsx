@@ -1,5 +1,5 @@
 import { AnimationScope } from "framer-motion";
-import "../../styles/ResultOverlay.css";
+import "../../styles/global.css";
 
 interface Props {
   scope: AnimationScope;

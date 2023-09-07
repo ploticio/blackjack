@@ -1,27 +1,30 @@
-import { useEffect } from "react";
 import { GameState, state } from "../../store/store";
-import { motion, useAnimate } from "framer-motion";
-import { Blockquote, Box, Button, Em, Flex, Heading, Popover, ScrollArea, Text } from "@radix-ui/themes";
-import { AppSettings } from "../../utilities/AppSettings";
+import { motion } from "framer-motion";
+import {
+  Blockquote,
+  Box,
+  Button,
+  Em,
+  Flex,
+  Grid,
+  Heading,
+  Popover,
+  ScrollArea,
+  Select,
+  Separator,
+  Switch,
+  Text,
+} from "@radix-ui/themes";
+import { useSnapshot } from "valtio";
+import { deck } from "../../utilities/cards";
 
-export default function StartMenu() {
-  const [scope, animate] = useAnimate();
-
-  const enterAnimation = async () => {
-    animate("h1", { scale: 4 }, { duration: 1 });
-    animate("h1", { rotate: [10, -10, 10] }, { duration: 3, ease: "easeInOut", repeat: Infinity });
-  };
-
-  const exitAnimation = async () => {
-    animate("h1", { scale: 0.01 }, { duration: AppSettings.TITLE_EXIT_SPEED });
-    await animate("button", { opacity: 0 }, { duration: AppSettings.TITLE_EXIT_SPEED });
-  };
-
-  useEffect(() => {
-    enterAnimation();
-  });
+export default function StartMenu({ exitAnimation }: { exitAnimation: () => Promise<void> }) {
+  const snapshot = useSnapshot(state);
 
   const handleGameStart = async () => {
+    for (let i = 0; i < snapshot.numberDecks; i++) {
+      state.shoe = [...state.shoe, ...deck];
+    }
     for (let i = 0; i < 10; i++) {
       state.shoe = state.shoe
         .map((card) => ({ card, sort: Math.random() }))
@@ -33,8 +36,7 @@ export default function StartMenu() {
   };
 
   return (
-    <Flex direction="column" align="center" ref={scope}>
-      <Heading style={{ marginBottom: "10rem" }}>Blackjack!</Heading>
+    <Flex direction="column" align="center">
       <Flex direction="column" align="start" gap="9">
         <Button style={{ cursor: "pointer" }} variant="ghost" radius="large" onClick={() => handleGameStart()} asChild>
           <motion.button whileHover={{ scale: 1.2, originX: 0 }}>
@@ -55,6 +57,7 @@ export default function StartMenu() {
               <Box>
                 <Flex direction="column" gap="4" pr="2">
                   <Heading>How to Play</Heading>
+                  <Separator mt="-3" size="4" />
                   <Blockquote>
                     In <Em>Blackjack!</Em>, everyone plays against the dealer. Your goal is to draw cards with a value
                     as close to <Em>21</Em> as possible without going over. A hand that goes over <Em>21</Em> is a bust.
@@ -86,11 +89,48 @@ export default function StartMenu() {
           </Popover.Content>
         </Popover.Root>
 
-        <Button variant="ghost" radius="large" asChild>
-          <motion.button whileHover={{ scale: 1.1, originX: 0 }}>
-            <Text size="3">Settings</Text>
-          </motion.button>
-        </Button>
+        <Popover.Root>
+          <Popover.Trigger>
+            <Button variant="ghost" radius="large" asChild>
+              <motion.button whileHover={{ scale: 1.1, originX: 0 }}>
+                <Text size="3">Settings</Text>
+              </motion.button>
+            </Button>
+          </Popover.Trigger>
+          <Popover.Content style={{ width: "400px", height: "110px" }}>
+            <Heading>Options</Heading>
+            <Separator mt="1" mb="2" size="4" />
+            <Grid columns="2" width="auto" gap="2">
+              <Text>Number of decks in shoe: </Text>
+              <Select.Root
+                value={snapshot.numberDecks.toString()}
+                onValueChange={(value) => {
+                  state.numberDecks = Number(value);
+                }}
+              >
+                <Select.Trigger />
+                <Select.Content color="indigo">
+                  <Select.Group>
+                    <Select.Item value="1">1</Select.Item>
+                    <Select.Item value="2">2</Select.Item>
+                    <Select.Item value="3">3</Select.Item>
+                    <Select.Item value="4">4</Select.Item>
+                    <Select.Item value="5">5</Select.Item>
+                    <Select.Item value="6">6</Select.Item>
+                  </Select.Group>
+                </Select.Content>
+              </Select.Root>
+              <Text>Show Hand sums: </Text>
+              <Switch
+                color="indigo"
+                checked={snapshot.showSums}
+                onCheckedChange={(checked) => {
+                  state.showSums = checked;
+                }}
+              />
+            </Grid>
+          </Popover.Content>
+        </Popover.Root>
       </Flex>
     </Flex>
   );

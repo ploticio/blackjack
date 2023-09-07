@@ -1,4 +1,4 @@
-import "../../styles/HandComponent.css";
+import "../../styles/global.css";
 import HandSum from "./HandSum";
 import { Card } from "../../utilities/cards";
 import { Status } from "../../utilities/hands";
