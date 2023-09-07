@@ -1,7 +1,7 @@
+import "../../styles/StartMenu.css";
 import { useEffect } from "react";
 import { GameState, state } from "../../store/store";
-import "../../styles/StartMenu.css";
-import { useAnimate } from "framer-motion";
+import { motion, useAnimate } from "framer-motion";
 
 export default function StartMenu() {
   const [scope, animate] = useAnimate();
@@ -32,9 +32,19 @@ export default function StartMenu() {
   };
 
   return (
-    <div ref={scope}>
+    <div id="menu" ref={scope}>
       <h1 id="title">Blackjack!</h1>
-      <button onClick={() => handleGameStart()}>Play!</button>
+      <div className="button-nav">
+        <motion.button onClick={() => handleGameStart()} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          PLAY!
+        </motion.button>
+        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          How To Play
+        </motion.button>
+        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          Settings
+        </motion.button>
+      </div>
     </div>
   );
 }
