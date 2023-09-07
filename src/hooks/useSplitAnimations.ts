@@ -1,15 +1,11 @@
 import { useAnimate } from "framer-motion";
-import { AnimationSettings } from "./AnimationSettings";
+import { AppSettings } from "../utilities/AppSettings";
 
 export default function useSplitAnimations() {
   const [scope, animate] = useAnimate();
 
   const splitEnterAnimation = async () => {
-    await animate(
-      ":last-child",
-      { x: "75vw", y: "100vh" },
-      { type: "tween", duration: AnimationSettings.CARD_DRAW_SPEED }
-    );
+    await animate(":last-child", { x: "75vw", y: "100vh" }, { type: "tween", duration: AppSettings.CARD_DRAW_SPEED });
   };
 
   const splitExitAnimation = async () => {
@@ -17,7 +13,7 @@ export default function useSplitAnimations() {
       "img",
       // { x: "-75vw", y: "-100vh" },
       { scale: 0.01 },
-      { type: "tween", duration: AnimationSettings.CARD_EXIT_SPEED, delay: AnimationSettings.ROUND_END_TIMER }
+      { type: "tween", duration: AppSettings.CARD_EXIT_SPEED, delay: AppSettings.ROUND_END_TIMER }
     );
   };
 

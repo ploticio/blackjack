@@ -1,7 +1,7 @@
 import "../../styles/HandComponent.css";
 import { useEffect, useState } from "react";
 import { Status } from "../../utilities/hands";
-import { AnimationSettings } from "../../hooks/AnimationSettings";
+import { AppSettings } from "../../utilities/AppSettings";
 import { useAnimate } from "framer-motion";
 
 interface IProps {
@@ -23,19 +23,19 @@ export default function HandSum({ sum, status, isDealer }: IProps) {
   useEffect(() => {
     setTimeout(() => {
       setDelayedNum(sum);
-    }, AnimationSettings.CARD_DRAW_SPEED * 1000);
+    }, AppSettings.CARD_DRAW_SPEED * 1000);
   }, [sum]);
 
   const enterAnimation = async () => {
     animate(
       scope.current,
       { scale: 100 },
-      { duration: AnimationSettings.SUM_LABEL_SPEED, delay: AnimationSettings.CARD_DRAW_SPEED * 4 }
+      { duration: AppSettings.SUM_LABEL_SPEED, delay: AppSettings.CARD_DRAW_SPEED * 4 }
     );
   };
 
   const exitAnimation = async () => {
-    animate(scope.current, { scale: 0.01 }, { duration: AnimationSettings.SUM_LABEL_SPEED });
+    animate(scope.current, { scale: 0.01 }, { duration: AppSettings.SUM_LABEL_SPEED });
   };
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function HandSum({ sum, status, isDealer }: IProps) {
     if (status === Status.Win || status === Status.Push || status === Status.Loss || status === Status.Bust) {
       setTimeout(() => {
         exitAnimation();
-      }, (AnimationSettings.OVERLAY_DELAY + AnimationSettings.OVERLAY_DURATION + AnimationSettings.OVERLAY_SPEED * 2 + AnimationSettings.CARD_EXIT_SPEED) * 1000);
+      }, (AppSettings.OVERLAY_DELAY + AppSettings.OVERLAY_DURATION + AppSettings.OVERLAY_SPEED * 2 + AppSettings.CARD_EXIT_SPEED) * 1000);
     }
   }, [status]);
 

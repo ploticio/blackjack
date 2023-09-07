@@ -32,7 +32,7 @@ export const state = proxy<IState>({
   splitHand: new PlayerHand(),
   discarded: [],
   startScreen: true,
-  bank: 1000,
+  bank: 500,
   bet: 0,
   buffer: 0,
 });

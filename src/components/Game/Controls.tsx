@@ -2,7 +2,9 @@ import { useSnapshot } from "valtio";
 import { GameState, state } from "../../store/store";
 import { Status } from "../../utilities/hands";
 import { useEffect, useState } from "react";
-import { AnimationSettings } from "../../hooks/AnimationSettings";
+import { AppSettings } from "../../utilities/AppSettings";
+import { Button, Flex, Text } from "@radix-ui/themes";
+import { motion } from "framer-motion";
 
 interface Props {
   playerAnimations: PlayerAnimations;
@@ -169,13 +171,13 @@ export default function Controls({
       state.dealerHand.hand.status = Status.Standing;
       // Check for dealer bust
       if (state.dealerHand.hand.getSum().hardTotal > 21) {
-        state.dealerHand.hand.status = Status.Loss;
         if (state.splitHand.hand.status === Status.Standing) {
           state.splitHand.hand.status = Status.Win;
           await displayOverlay("Win!");
         }
         if (state.playerHand.hand.status === Status.Standing) {
           state.playerHand.hand.status = Status.Win;
+          state.dealerHand.hand.status = Status.Loss;
           await displayOverlay("Win!");
         }
         await handleNewRound();
@@ -268,7 +270,7 @@ export default function Controls({
       // Check for double blackjack
       state.playerHand.checkBlackjack();
       if (state.playerHand.blackjack) {
-        await timeout(AnimationSettings.BLACKJACK_DELAY);
+        await timeout(AppSettings.BLACKJACK_DELAY);
         await dealerFlip();
         state.playerHand.hand.status = Status.Win;
         state.dealerHand.hand.status = Status.Loss;
@@ -282,19 +284,19 @@ export default function Controls({
     const pBlackjack = state.playerHand.checkBlackjack();
     const dBlackjack = state.dealerHand.checkBlackjack();
     if (pBlackjack && !dBlackjack) {
-      await timeout(AnimationSettings.BLACKJACK_DELAY);
+      await timeout(AppSettings.BLACKJACK_DELAY);
       await dealerFlip();
       state.dealerHand.hand.status = Status.Loss;
       state.playerHand.hand.status = Status.Win;
       await handleNewRound("Blackjack!");
     } else if (!pBlackjack && dBlackjack) {
-      await timeout(AnimationSettings.BLACKJACK_DELAY);
+      await timeout(AppSettings.BLACKJACK_DELAY);
       await dealerFlip();
       state.dealerHand.hand.status = Status.Win;
       state.playerHand.hand.status = Status.Loss;
       await handleNewRound("Loss!");
     } else if (pBlackjack && dBlackjack) {
-      await timeout(AnimationSettings.BLACKJACK_DELAY);
+      await timeout(AppSettings.BLACKJACK_DELAY);
       await dealerFlip();
       state.dealerHand.hand.status = Status.Push;
       state.playerHand.hand.status = Status.Push;
@@ -311,10 +313,10 @@ export default function Controls({
   }
 
   async function displayOverlay(text: string) {
-    await timeout(AnimationSettings.OVERLAY_DELAY);
+    await timeout(AppSettings.OVERLAY_DELAY);
     await setOverlayValue(text);
     await overlayAnimations.showOverlay();
-    await timeout(AnimationSettings.OVERLAY_DURATION);
+    await timeout(AppSettings.OVERLAY_DURATION);
     await overlayAnimations.hideOverlay();
   }
 
@@ -374,21 +376,59 @@ export default function Controls({
   const canDouble =
     (snapshot.playerHand.hand.status === Status.Playing &&
       snapshot.playerHand.hand.cards.length === 2 &&
-      snapshot.bank - snapshot.playerHand.bet + snapshot.splitHand.bet >= 2 * snapshot.playerHand.bet) ||
+      snapshot.playerHand.bet * 2 + snapshot.splitHand.bet <= snapshot.bank) ||
     (snapshot.splitHand.hand.status === Status.Playing &&
       snapshot.splitHand.hand.cards.length === 2 &&
-      snapshot.bank - snapshot.playerHand.bet + snapshot.splitHand.bet >= 2 * snapshot.splitHand.bet);
+      snapshot.splitHand.bet * 2 + snapshot.playerHand.bet <= snapshot.bank);
 
   return (
     <div>
       {enableControls &&
         (snapshot.playerHand.hand.status === Status.Playing || snapshot.splitHand.hand.status === Status.Playing) && (
-          <>
-            <button onClick={() => handleHit()}>Hit</button>
-            <button onClick={() => handleStanding()}>Stand</button>
-            {canDouble && <button onClick={() => handleDouble()}>Double</button>}
-            {canSplit && <button onClick={() => handleSplit()}>Split</button>}
-          </>
+          <Flex justify="center" gap="6">
+            <Button style={{ cursor: "pointer" }} variant="ghost" radius="large" onClick={() => handleHit()} asChild>
+              <motion.button whileHover={{ scale: 1.1, originX: 0 }}>
+                <Text size="6">Hit</Text>
+              </motion.button>
+            </Button>
+            <Button
+              style={{ cursor: "pointer" }}
+              variant="ghost"
+              radius="large"
+              onClick={() => handleStanding()}
+              asChild
+            >
+              <motion.button whileHover={{ scale: 1.1, originX: 0 }}>
+                <Text size="6">Stand</Text>
+              </motion.button>
+            </Button>
+            {canDouble && (
+              <Button
+                style={{ cursor: "pointer" }}
+                variant="ghost"
+                radius="large"
+                onClick={() => handleDouble()}
+                asChild
+              >
+                <motion.button whileHover={{ scale: 1.1, originX: 0 }}>
+                  <Text size="6">Double</Text>
+                </motion.button>
+              </Button>
+            )}
+            {canSplit && (
+              <Button
+                style={{ cursor: "pointer" }}
+                variant="ghost"
+                radius="large"
+                onClick={() => handleSplit()}
+                asChild
+              >
+                <motion.button whileHover={{ scale: 1.1, originX: 0 }}>
+                  <Text size="6">Split</Text>
+                </motion.button>
+              </Button>
+            )}
+          </Flex>
         )}
     </div>
   );

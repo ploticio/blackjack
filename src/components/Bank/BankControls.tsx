@@ -1,7 +1,15 @@
 import { useSnapshot } from "valtio";
 import { state, GameState } from "../../store/store";
 import { Status } from "../../utilities/hands";
-import { animate } from "framer-motion";
+import { animate, motion } from "framer-motion";
+import { Button, Flex, Text } from "@radix-ui/themes";
+import five_chip from "../../assets/chips/5chip.svg";
+import twenty_five_chip from "../../assets/chips/25chip.svg";
+import fifty_chip from "../../assets/chips/50chip.svg";
+import one_hundred_chip from "../../assets/chips/100chip.svg";
+import five_hundred_chip from "../../assets/chips/500chip.svg";
+import one_thousand_chip from "../../assets/chips/1000chip.svg";
+import five_thousand_chip from "../../assets/chips/5000chip.svg";
 
 interface Props {
   exitAnimation: () => Promise<void>;
@@ -33,10 +41,12 @@ export default function BankControls({ exitAnimation }: Props) {
   };
 
   async function submitBet() {
-    state.playerHand.bet = state.bet;
-    await exitAnimation();
-    state.gameState = GameState.Playing;
-    initGame();
+    if (snapshot.bet > 0) {
+      state.playerHand.bet = state.bet;
+      await exitAnimation();
+      state.gameState = GameState.Playing;
+      initGame();
+    }
   }
 
   async function initGame() {
@@ -50,20 +60,87 @@ export default function BankControls({ exitAnimation }: Props) {
   }
 
   return (
-    <>
-      <button onClick={() => handleChangeBet(5)}>+5</button>
-      <button onClick={() => handleChangeBet(10)}>+10</button>
-      <button onClick={() => handleChangeBet(25)}>+25</button>
-      <button onClick={() => handleChangeBet(50)}>+50</button>
-      <button onClick={() => handleChangeBet(100)}>+100</button>
-      <button onClick={() => handleResetBet()}>Reset</button>
-      {snapshot.bet > 0 && (
-        <div>
-          <button id="submit" onClick={() => handleSubmit()}>
-            Submit Bet
-          </button>
-        </div>
-      )}
-    </>
+    <Flex direction="column" align="center" gap="6">
+      <Flex gap="2">
+        <motion.img
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ scale: 0.01 }}
+          animate={{ scale: 1 }}
+          src={five_chip}
+          onClick={() => handleChangeBet(5)}
+        />
+        <motion.img
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ scale: 0.01 }}
+          animate={{ scale: 1 }}
+          src={twenty_five_chip}
+          onClick={() => handleChangeBet(25)}
+        />
+        <motion.img
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ scale: 0.01 }}
+          animate={{ scale: 1 }}
+          src={fifty_chip}
+          onClick={() => handleChangeBet(50)}
+        />
+        <motion.img
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ scale: 0.01 }}
+          animate={{ scale: 1 }}
+          src={one_hundred_chip}
+          onClick={() => handleChangeBet(100)}
+        />
+        <motion.img
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ scale: 0.01 }}
+          animate={{ scale: 1 }}
+          src={five_hundred_chip}
+          onClick={() => handleChangeBet(500)}
+        />
+        <motion.img
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ scale: 0.01 }}
+          animate={{ scale: 1 }}
+          src={one_thousand_chip}
+          onClick={() => handleChangeBet(1000)}
+        />
+        <motion.img
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ scale: 0.01 }}
+          animate={{ scale: 1 }}
+          src={five_thousand_chip}
+          onClick={() => handleChangeBet(5000)}
+        />
+      </Flex>
+      <Flex gap="9">
+        <Button style={{ cursor: "pointer" }} variant="ghost" onClick={() => handleResetBet()}>
+          <Text size="6">Reset</Text>
+        </Button>
+        <Button
+          style={{ cursor: "pointer" }}
+          variant="ghost"
+          onClick={() => handleChangeBet(snapshot.bank - snapshot.bet)}
+        >
+          <Text size="6" asChild>
+            <motion.span
+              animate={{ rotate: [10, -10, 10] }}
+              transition={{ duration: 3, ease: "easeInOut", repeat: Infinity }}
+            >
+              All in! 🤑
+            </motion.span>
+          </Text>
+        </Button>
+        <Button style={{ cursor: "pointer" }} variant="ghost" id="submit" onClick={() => handleSubmit()}>
+          <Text size="6">Bet!</Text>
+        </Button>
+      </Flex>
+    </Flex>
   );
 }

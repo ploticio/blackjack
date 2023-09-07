@@ -1,10 +1,9 @@
 .hand {
   display: flex;
-  padding: 2rem;
   justify-content: center;
 }
 
-img {
+.hand img {
   margin-left: -90px;
   margin-right: -90px;
   position: relative;
