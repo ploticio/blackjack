@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Title from "./Title";
 import StartMenu from "./StartMenu";
 
-export default function GameMenu() {
+export default function GameMenu({ playMusic }: { playMusic: () => void }) {
   const [scope, animate] = useAnimate();
 
   const enterAnimation = async () => {
@@ -24,7 +24,7 @@ export default function GameMenu() {
   return (
     <div ref={scope}>
       <Title />
-      <StartMenu exitAnimation={exitAnimation} />
+      <StartMenu exitAnimation={exitAnimation} playMusic={playMusic} />
     </div>
   );
 }

@@ -18,10 +18,17 @@ import {
 import { useSnapshot } from "valtio";
 import { deck } from "../../utilities/cards";
 
-export default function StartMenu({ exitAnimation }: { exitAnimation: () => Promise<void> }) {
+export default function StartMenu({
+  exitAnimation,
+  playMusic,
+}: {
+  exitAnimation: () => Promise<void>;
+  playMusic: () => void;
+}) {
   const snapshot = useSnapshot(state);
 
   const handleGameStart = async () => {
+    playMusic();
     for (let i = 0; i < snapshot.numberDecks; i++) {
       state.shoe = [...state.shoe, ...deck];
     }

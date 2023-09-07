@@ -1,7 +1,7 @@
 import type {} from "@redux-devtools/extension";
 import { devtools } from "valtio/utils";
 import { proxy } from "valtio";
-import { Card, deck } from "../utilities/cards";
+import { Card } from "../utilities/cards";
 import { DealerHand, PlayerHand } from "../utilities/hands";
 
 export enum GameState {
@@ -24,6 +24,7 @@ interface IState {
   buffer: number;
   showSums: boolean;
   numberDecks: number;
+  musicVolume: number;
 }
 
 export const state = proxy<IState>({
@@ -39,6 +40,7 @@ export const state = proxy<IState>({
   buffer: 0,
   showSums: true,
   numberDecks: 4,
+  musicVolume: 50,
 });
 
 const unsub = devtools(state, { name: "myState", enabled: true });
