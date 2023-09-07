@@ -6,20 +6,30 @@ import { useSnapshot } from "valtio";
 import { state, GameState } from "../../store/store";
 import { Flex, Link, Text } from "@radix-ui/themes";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import card_sound from "../../assets/sounds/card-draw.wav";
+import coin_sound from "../../assets/sounds/coin.mp3";
 
 export default function UIComponent() {
   const snapshot = useSnapshot(state);
+
+  const playCardSound = () => {
+    new Audio(card_sound).play();
+  };
+
+  const playCoinSound = () => {
+    new Audio(coin_sound).play();
+  };
 
   const showUI = () => {
     switch (snapshot.gameState) {
       case GameState.Menu:
         return <StartMenu />;
       case GameState.Betting:
-        return <BankUI />;
+        return <BankUI playCoinSound={playCoinSound} />;
       case GameState.Gameover:
         return <GameOver />;
       default:
-        return <GameUI />;
+        return <GameUI playCardSound={playCardSound} />;
     }
   };
 

@@ -4,7 +4,7 @@ import { useAnimate } from "framer-motion";
 import { useEffect } from "react";
 import { Flex } from "@radix-ui/themes";
 
-export default function BankUI() {
+export default function BankUI({ playCoinSound }: { playCoinSound: () => void }) {
   const [scope, animate] = useAnimate();
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function BankUI() {
   return (
     <Flex direction="column" gap="9" ref={scope}>
       <BankDisplay />
-      <BankControls exitAnimation={exitAnimation} />
+      <BankControls exitAnimation={exitAnimation} playCoinSound={playCoinSound} />
     </Flex>
   );
 }

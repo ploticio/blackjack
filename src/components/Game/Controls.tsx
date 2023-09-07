@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AppSettings } from "../../utilities/AppSettings";
 import { Button, Flex, Text } from "@radix-ui/themes";
 import { motion } from "framer-motion";
+import { two_card } from "../../utilities/cards";
 
 interface Props {
   playerAnimations: PlayerAnimations;
@@ -12,6 +13,7 @@ interface Props {
   dealerAnimations: DealerAnimations;
   overlayAnimations: OverlayAnimations;
   setOverlayValue: (result: string) => void;
+  playCardSound: () => void;
 }
 
 interface SplitAnimations {
@@ -45,6 +47,7 @@ export default function Controls({
   dealerAnimations,
   overlayAnimations,
   setOverlayValue,
+  playCardSound,
 }: Props) {
   const snapshot = useSnapshot(state);
   const [enableControls, setEnableControls] = useState(false);
@@ -88,9 +91,13 @@ export default function Controls({
   }, [snapshot.splitHand.hand.cards.length]);
 
   async function playAnimations() {
+    playCardSound();
     await playerAnimations.playerInitAnimation();
+    playCardSound();
     await dealerAnimations.dealerInitAnimation();
+    playCardSound();
     await playerAnimations.playerEnterAnimation();
+    playCardSound();
     await dealerAnimations.dealerEnterAnimation();
     await handleBlackjacks();
     setEnableControls(true);
@@ -102,6 +109,7 @@ export default function Controls({
   }
 
   async function hitPlayerHand() {
+    playCardSound();
     state.playerHand.hand.addRandom();
     // state.playerHand.hand.addToHand(two_card);
     await playerAnimations.playerEnterAnimation();
@@ -127,6 +135,7 @@ export default function Controls({
   }
 
   async function hitSplitHand() {
+    playCardSound();
     state.splitHand.hand.addRandom();
     await splitAnimations.splitEnterAnimation();
     if (state.splitHand.hand.getSum().hardTotal > 21) {
@@ -149,6 +158,7 @@ export default function Controls({
     if (state.splitHand.hand.status === Status.Playing) {
       state.splitHand.hand.status = Status.Standing;
       state.playerHand.hand.status = Status.Playing;
+      playCardSound();
       state.playerHand.hand.addRandom();
       await playerAnimations.playerEnterAnimation();
       // Check if playerhand gets blackjack after splithand stands
@@ -165,7 +175,9 @@ export default function Controls({
         state.dealerHand.hand.getSum().softTotal < 17 ||
         (state.dealerHand.hand.getSum().softTotal > 21 && state.dealerHand.hand.getSum().hardTotal < 17)
       ) {
-        state.dealerHand.hand.addRandom();
+        playCardSound();
+        // state.dealerHand.hand.addRandom();
+        state.dealerHand.hand.addToHand(two_card);
         await dealerAnimations.dealerEnterAnimation();
       }
       state.dealerHand.hand.status = Status.Standing;
@@ -228,6 +240,7 @@ export default function Controls({
   }
 
   async function dealerFlip() {
+    playCardSound();
     await dealerAnimations.exitFlipAnimation();
     state.dealerHand.hand.cards.pop();
     state.dealerHand.hand.addToHand(state.dealerHand._holeCard);
@@ -255,8 +268,10 @@ export default function Controls({
     state.splitHand.hand.addToHand(temp);
     await playerAnimations.playerSplitAnimation();
     state.playerHand.removeEnd();
+    playCardSound();
     await splitAnimations.splitEnterAnimation();
     state.splitHand.hand.addRandom();
+    playCardSound();
     await splitAnimations.splitEnterAnimation();
     state.splitHand.bet = state.playerHand.bet;
     // Check for blackjack immediately after splitting
@@ -265,6 +280,7 @@ export default function Controls({
       state.splitHand.hand.status = Status.Win;
       state.playerHand.hand.status = Status.Playing;
       await displayOverlay("Blackjack!");
+      playCardSound();
       state.playerHand.hand.addRandom();
       await playerAnimations.playerEnterAnimation();
       // Check for double blackjack

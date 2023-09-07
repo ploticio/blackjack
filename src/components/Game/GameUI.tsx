@@ -8,7 +8,7 @@ import useSplitAnimations from "../../hooks/useSplitAnimations";
 import useOverlayAnimations from "../../hooks/useOverlayAnimations";
 import { useState } from "react";
 
-export default function GameUI() {
+export default function GameUI({ playCardSound }: { playCardSound: () => void }) {
   const { scope: playerScope, playerAnimations } = usePlayerAnimations();
   const { scope: dealerScope, dealerAnimations } = useDealerAnimations();
   const { scope: splitScope, splitAnimations } = useSplitAnimations();
@@ -26,6 +26,7 @@ export default function GameUI() {
         splitAnimations={splitAnimations}
         overlayAnimations={overlayAnimations}
         setOverlayValue={setOverlayValue}
+        playCardSound={playCardSound}
       />
     </>
   );

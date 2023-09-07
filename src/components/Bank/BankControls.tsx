@@ -10,12 +10,14 @@ import one_hundred_chip from "../../assets/chips/100chip.svg";
 import five_hundred_chip from "../../assets/chips/500chip.svg";
 import one_thousand_chip from "../../assets/chips/1000chip.svg";
 import five_thousand_chip from "../../assets/chips/5000chip.svg";
+import { two_card } from "../../utilities/cards";
 
 interface Props {
   exitAnimation: () => Promise<void>;
+  playCoinSound: () => void;
 }
 
-export default function BankControls({ exitAnimation }: Props) {
+export default function BankControls({ exitAnimation, playCoinSound }: Props) {
   const snapshot = useSnapshot(state);
 
   const handleSubmit = () => {
@@ -24,6 +26,7 @@ export default function BankControls({ exitAnimation }: Props) {
 
   const handleChangeBet = (amount: number) => {
     if (state.bet + amount <= state.bank) {
+      playCoinSound();
       state.bet = state.bet + amount;
       animate(state.buffer, state.bet, {
         duration: 1,
@@ -53,9 +56,14 @@ export default function BankControls({ exitAnimation }: Props) {
     state.playerHand.hand.status = Status.Playing;
     state.dealerHand.hand.status = Status.Standby;
 
-    state.playerHand.hand.addRandom();
-    state.dealerHand.hand.addRandom();
-    state.playerHand.hand.addRandom();
+    // state.playerHand.hand.addRandom();
+    // state.dealerHand.hand.addRandom();
+    // state.playerHand.hand.addRandom();
+    // state.dealerHand.addHoleCard();
+
+    state.playerHand.hand.addToHand(two_card);
+    state.dealerHand.hand.addToHand(two_card);
+    state.playerHand.hand.addToHand(two_card);
     state.dealerHand.addHoleCard();
   }
 
@@ -63,6 +71,7 @@ export default function BankControls({ exitAnimation }: Props) {
     <Flex direction="column" align="center" gap="6">
       <Flex gap="2">
         <motion.img
+          style={{ cursor: "pointer" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ scale: 0.01 }}
@@ -71,6 +80,7 @@ export default function BankControls({ exitAnimation }: Props) {
           onClick={() => handleChangeBet(5)}
         />
         <motion.img
+          style={{ cursor: "pointer" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ scale: 0.01 }}
@@ -79,6 +89,7 @@ export default function BankControls({ exitAnimation }: Props) {
           onClick={() => handleChangeBet(25)}
         />
         <motion.img
+          style={{ cursor: "pointer" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ scale: 0.01 }}
@@ -87,6 +98,7 @@ export default function BankControls({ exitAnimation }: Props) {
           onClick={() => handleChangeBet(50)}
         />
         <motion.img
+          style={{ cursor: "pointer" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ scale: 0.01 }}
@@ -95,6 +107,7 @@ export default function BankControls({ exitAnimation }: Props) {
           onClick={() => handleChangeBet(100)}
         />
         <motion.img
+          style={{ cursor: "pointer" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ scale: 0.01 }}
@@ -103,6 +116,7 @@ export default function BankControls({ exitAnimation }: Props) {
           onClick={() => handleChangeBet(500)}
         />
         <motion.img
+          style={{ cursor: "pointer" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ scale: 0.01 }}
@@ -111,6 +125,7 @@ export default function BankControls({ exitAnimation }: Props) {
           onClick={() => handleChangeBet(1000)}
         />
         <motion.img
+          style={{ cursor: "pointer" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           initial={{ scale: 0.01 }}
