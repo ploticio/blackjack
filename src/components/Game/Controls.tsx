@@ -171,7 +171,7 @@ export default function Controls({
         state.playerHand.hand.status = Status.Standing;
       await dealerFlip();
       while (
-        state.dealerHand.hand.getSum().softTotal < 17 ||
+        state.dealerHand.hand.getSum().softTotal < (state.standSeventeen ? 17 : 18) ||
         (state.dealerHand.hand.getSum().softTotal > 21 && state.dealerHand.hand.getSum().hardTotal < 17)
       ) {
         playCardSound();

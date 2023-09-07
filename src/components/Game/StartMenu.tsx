@@ -104,7 +104,7 @@ export default function StartMenu({
               </motion.button>
             </Button>
           </Popover.Trigger>
-          <Popover.Content style={{ width: "400px", height: "110px" }}>
+          <Popover.Content style={{ width: "400px", height: "140px" }}>
             <Heading>Options</Heading>
             <Separator mt="1" mb="2" size="4" />
             <Grid columns="2" width="auto" gap="2">
@@ -133,6 +133,14 @@ export default function StartMenu({
                 checked={snapshot.showSums}
                 onCheckedChange={(checked) => {
                   state.showSums = checked;
+                }}
+              />
+              {snapshot.standSeventeen ? <Text>Dealer stands on soft 17</Text> : <Text>Dealer hits on soft 17</Text>}
+              <Switch
+                color="indigo"
+                checked={snapshot.standSeventeen}
+                onCheckedChange={(checked) => {
+                  state.standSeventeen = checked;
                 }}
               />
             </Grid>

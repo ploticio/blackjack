@@ -25,6 +25,7 @@ interface IState {
   showSums: boolean;
   numberDecks: number;
   musicVolume: number;
+  standSeventeen: boolean;
 }
 
 export const state = proxy<IState>({
@@ -41,6 +42,7 @@ export const state = proxy<IState>({
   showSums: true,
   numberDecks: 4,
   musicVolume: 50,
+  standSeventeen: true,
 });
 
 const unsub = devtools(state, { name: "myState", enabled: true });
