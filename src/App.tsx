@@ -5,7 +5,7 @@ import { Theme } from "@radix-ui/themes";
 
 function App() {
   return (
-    <Theme accentColor="gray" appearance="dark">
+    <Theme accentColor="gray">
       <div className="App">
         <UIComponent />
       </div>

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { AppSettings } from "../../utilities/AppSettings";
 import { Button, Flex, Text } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { two_card } from "../../utilities/cards";
 
 interface Props {
   playerAnimations: PlayerAnimations;
@@ -176,8 +175,7 @@ export default function Controls({
         (state.dealerHand.hand.getSum().softTotal > 21 && state.dealerHand.hand.getSum().hardTotal < 17)
       ) {
         playCardSound();
-        // state.dealerHand.hand.addRandom();
-        state.dealerHand.hand.addToHand(two_card);
+        state.dealerHand.hand.addRandom();
         await dealerAnimations.dealerEnterAnimation();
       }
       state.dealerHand.hand.status = Status.Standing;
