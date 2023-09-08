@@ -8,7 +8,7 @@ export default function VolumeControl({ handleVolume }: { handleVolume: (value: 
 
   return (
     <Popover.Root>
-      <Popover.Trigger style={{ position: "fixed", bottom: "5%", left: "2.5%" }}>
+      <Popover.Trigger style={{ position: "fixed", bottom: "5px", left: "5px" }}>
         <Button variant="soft" radius="full">
           <SpeakerModerateIcon />
         </Button>

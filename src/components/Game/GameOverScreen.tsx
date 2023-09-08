@@ -12,7 +12,7 @@ export default function GameOver() {
   });
 
   const enterAnimation = async () => {
-    animate("h1", { scale: 4 });
+    animate("h1", { scale: 3 });
     animate("button", { scale: 1 });
   };
 

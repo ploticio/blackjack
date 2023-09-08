@@ -1,3 +1,4 @@
+import "../../styles/global.css";
 import { useSnapshot } from "valtio";
 import { state, GameState } from "../../store/store";
 import { Status } from "../../utilities/hands";
@@ -10,6 +11,7 @@ import one_hundred_chip from "../../assets/chips/100chip.svg";
 import five_hundred_chip from "../../assets/chips/500chip.svg";
 import one_thousand_chip from "../../assets/chips/1000chip.svg";
 import five_thousand_chip from "../../assets/chips/5000chip.svg";
+import { ace_card, ten_card } from "../../utilities/cards";
 
 interface Props {
   exitAnimation: () => Promise<void>;
@@ -55,15 +57,20 @@ export default function BankControls({ exitAnimation, playCoinSound }: Props) {
     state.playerHand.hand.status = Status.Playing;
     state.dealerHand.hand.status = Status.Standby;
 
-    state.playerHand.hand.addRandom();
+    // state.playerHand.hand.addRandom();
+    // state.dealerHand.hand.addRandom();
+    // state.playerHand.hand.addRandom();
+    // state.dealerHand.addHoleCard();
+
+    state.playerHand.hand.addToHand(ten_card);
     state.dealerHand.hand.addRandom();
-    state.playerHand.hand.addRandom();
+    state.playerHand.hand.addToHand(ace_card);
     state.dealerHand.addHoleCard();
   }
 
   return (
     <Flex direction="column" align="center" gap="6">
-      <Flex gap="2">
+      <Flex gap="2" wrap="wrap" justify="center" className="chip-container">
         <motion.img
           style={{ cursor: "pointer" }}
           whileHover={{ scale: 1.1 }}

@@ -6,7 +6,7 @@ export default function MoneyComponent() {
   const snapshot = useSnapshot(state);
   return (
     <>
-      <Heading size="1">Bank: {snapshot.bank}</Heading>
+      <Heading size="1">Bank: ${snapshot.bank.toFixed(2).replace(/\.00$/, "")}</Heading>
     </>
   );
 }

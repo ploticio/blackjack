@@ -59,7 +59,7 @@ export default function StartMenu({
               </motion.button>
             </Button>
           </Popover.Trigger>
-          <Popover.Content style={{ width: "400px", height: "250px" }}>
+          <Popover.Content style={{ width: "375px", maxWidth: "100%", height: "250px" }}>
             <ScrollArea>
               <Box>
                 <Flex direction="column" gap="4" pr="2">
@@ -79,10 +79,10 @@ export default function StartMenu({
                     (where an ace in the hand counts as an <Em>11</Em>).
                   </Text>
                   <Text>
-                    Both the player and the dealer starts with two cards. If your two cards sum to 21, congratulations!
-                    You have a <Em>Blackjack!</Em> and will be paid an additional <Em>3:2</Em> odds on your bet.
-                    However, if the dealer has a <Em>Blackjack!</Em>, you lose will lose immediately unless you have a{" "}
-                    <Em>Blackjack!</Em> too.
+                    Both the player and the dealer starts with two cards. If your two cards sum to <Em>21</Em>,
+                    congratulations! You have a <Em>Blackjack!</Em> and will be paid an additional <Em>3:2</Em> odds on
+                    your bet. However, if the dealer has a <Em>Blackjack!</Em>, you lose will lose immediately unless
+                    you have a <Em>Blackjack!</Em> too.
                   </Text>
 
                   <Text>
@@ -104,7 +104,7 @@ export default function StartMenu({
               </motion.button>
             </Button>
           </Popover.Trigger>
-          <Popover.Content style={{ width: "400px", height: "140px" }}>
+          <Popover.Content style={{ width: "375px", maxWidth: "100%", height: "140px" }}>
             <Heading>Options</Heading>
             <Separator mt="1" mb="2" size="4" />
             <Grid columns="2" width="auto" gap="2">
