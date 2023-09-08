@@ -62,9 +62,11 @@ export default function UIComponent() {
       {showUI()}
       <VolumeControl handleVolume={handleVolume} />
       <Link href="https://github.com/ploticio/blackjack" target="_blank" rel="noopener noreferrer">
-        <Flex align="center" justify="center" style={{ position: "fixed", bottom: "2px", right: "8px" }}>
+        <Flex align="center" justify="center" style={{ position: "fixed", bottom: "5px", right: "5px" }}>
           <GitHubLogoIcon />
-          <Text ml="1">Made by ploticio</Text>
+          <Text id="credit-tag" ml="1">
+            Made by ploticio
+          </Text>
         </Flex>
       </Link>
     </div>

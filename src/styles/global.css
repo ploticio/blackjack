@@ -59,4 +59,8 @@
   .chip-container img {
     width: 100px;
   }
+
+  #credit-tag {
+    display: none;
+  }
 }
