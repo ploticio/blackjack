@@ -29,7 +29,6 @@ Lose money without actually losing money here.
 
 ## 🤔 Some future considerations
 
-- Make it mobile-friendly.
 - Dark Theme (Radix UI's dark theme does not work with Vite atm)
 - Popup button that allows players to hover over and look at a Blackjack '[basic strategy](https://www.blackjackapprenticeship.com/blackjack-strategy-charts/)' chart
 - Card counting mode that teaches players how to count cards.
