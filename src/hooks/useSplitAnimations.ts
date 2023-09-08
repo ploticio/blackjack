@@ -17,7 +17,16 @@ export default function useSplitAnimations() {
     );
   };
 
-  const splitAnimations = { splitEnterAnimation, splitExitAnimation };
+  const splitFadeOutAnimation = async () => {
+    animate("img", { zIndex: -1 });
+    await animate("img", { opacity: 0.3 }, { duration: AppSettings.OVERLAY_SPEED });
+  };
+
+  const splitFadeInAnimation = async () => {
+    await animate("img", { opacity: 1 }, { duration: AppSettings.OVERLAY_SPEED });
+  };
+
+  const splitAnimations = { splitEnterAnimation, splitExitAnimation, splitFadeOutAnimation, splitFadeInAnimation };
 
   return { scope, splitAnimations };
 }

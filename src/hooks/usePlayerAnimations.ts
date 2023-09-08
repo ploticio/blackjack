@@ -17,6 +17,15 @@ export default function usePlayerAnimations() {
     );
   };
 
+  const playerFadeOutAnimation = async () => {
+    await animate("img", { opacity: 0.3 }, { duration: AppSettings.OVERLAY_SPEED });
+  };
+
+  const playerFadeInAnimation = async () => {
+    animate("img", { opacity: 1 }, { duration: AppSettings.OVERLAY_SPEED });
+    await animate("img", { opacity: 1 }, { duration: AppSettings.OVERLAY_SPEED });
+  };
+
   const playerSplitAnimation = async () => {
     await animate(":last-child", { opacity: 0 }, { type: "tween", duration: AppSettings.CARD_DRAW_SPEED });
   };
@@ -25,7 +34,14 @@ export default function usePlayerAnimations() {
     await animate(":first-child", { x: "75vw", y: "100vh" }, { type: "tween", duration: AppSettings.CARD_DRAW_SPEED });
   };
 
-  const playerAnimations = { playerEnterAnimation, playerExitAnimation, playerSplitAnimation, playerInitAnimation };
+  const playerAnimations = {
+    playerEnterAnimation,
+    playerExitAnimation,
+    playerSplitAnimation,
+    playerInitAnimation,
+    playerFadeOutAnimation,
+    playerFadeInAnimation,
+  };
 
   return {
     scope,

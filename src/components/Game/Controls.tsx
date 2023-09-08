@@ -18,6 +18,8 @@ interface Props {
 interface SplitAnimations {
   splitEnterAnimation: () => Promise<void>;
   splitExitAnimation: () => Promise<void>;
+  splitFadeOutAnimation: () => Promise<void>;
+  splitFadeInAnimation: () => Promise<void>;
 }
 
 interface PlayerAnimations {
@@ -25,6 +27,8 @@ interface PlayerAnimations {
   playerExitAnimation: () => Promise<void>;
   playerSplitAnimation: () => Promise<void>;
   playerInitAnimation: () => Promise<void>;
+  playerFadeOutAnimation: () => Promise<void>;
+  playerFadeInAnimation: () => Promise<void>;
 }
 
 interface DealerAnimations {
@@ -110,12 +114,12 @@ export default function Controls({
   async function hitPlayerHand() {
     playCardSound();
     state.playerHand.hand.addRandom();
-    // state.playerHand.hand.addToHand(two_card);
     await playerAnimations.playerEnterAnimation();
     if (state.playerHand.hand.getSum().hardTotal > 21) {
       state.playerHand.hand.status = Status.Bust;
       if (state.splitHand.hand.status === Status.Standing) {
         await displayOverlay("Bust!");
+        splitAnimations.splitFadeInAnimation();
         stand();
       }
       // End round if player busts and splithand is a blackjack
@@ -140,6 +144,8 @@ export default function Controls({
     if (state.splitHand.hand.getSum().hardTotal > 21) {
       state.splitHand.hand.status = Status.Bust;
       await displayOverlay("Bust!");
+      await splitAnimations.splitFadeOutAnimation();
+      await playerAnimations.playerFadeInAnimation();
       state.playerHand.hand.status = Status.Playing;
       state.playerHand.hand.addRandom();
       await playerAnimations.playerEnterAnimation();
@@ -154,9 +160,12 @@ export default function Controls({
   }
 
   async function stand() {
+    // Check if split hand is the current hand
     if (state.splitHand.hand.status === Status.Playing) {
       state.splitHand.hand.status = Status.Standing;
       state.playerHand.hand.status = Status.Playing;
+      await splitAnimations.splitFadeOutAnimation();
+      await playerAnimations.playerFadeInAnimation();
       playCardSound();
       state.playerHand.hand.addRandom();
       await playerAnimations.playerEnterAnimation();
@@ -165,10 +174,18 @@ export default function Controls({
         state.playerHand.hand.status = Status.Win;
         stand();
       }
-    } else {
+    }
+    // Else player hand is the current hand
+    else {
       // Set playerhand to Standing if not already a blackjack/bust (accounts for split hand situations)
       if (state.playerHand.hand.status !== Status.Bust && state.playerHand.hand.status !== Status.Win)
         state.playerHand.hand.status = Status.Standing;
+      if (
+        state.splitHand.hand.status === Status.Standing ||
+        state.splitHand.hand.status === Status.Win ||
+        state.splitHand.hand.status === Status.Bust
+      )
+        splitAnimations.splitFadeInAnimation();
       await dealerFlip();
       while (
         state.dealerHand.hand.getSum().softTotal < (state.standSeventeen ? 17 : 18) ||
@@ -272,12 +289,14 @@ export default function Controls({
     playCardSound();
     await splitAnimations.splitEnterAnimation();
     state.splitHand.bet = state.playerHand.bet;
+    playerAnimations.playerFadeOutAnimation();
     // Check for blackjack immediately after splitting
     state.splitHand.checkBlackjack();
     if (state.splitHand.blackjack) {
       state.splitHand.hand.status = Status.Win;
       state.playerHand.hand.status = Status.Playing;
       await displayOverlay("Blackjack!");
+      playerAnimations.playerFadeInAnimation();
       playCardSound();
       state.playerHand.hand.addRandom();
       await playerAnimations.playerEnterAnimation();
