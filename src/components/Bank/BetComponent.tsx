@@ -6,7 +6,7 @@ export default function BetComponent() {
   const snapshot = useSnapshot(state);
   return (
     <>
-      <Heading size="1">Bet: ${snapshot.buffer}</Heading>
+      <Heading size="1">Bet: ${snapshot.buffer.toFixed(2).replace(/\.00$/, "")}</Heading>
     </>
   );
 }

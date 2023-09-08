@@ -30,7 +30,7 @@ export default function BankControls({ exitAnimation, playCoinSound }: Props) {
       state.bet = state.bet + amount;
       animate(state.buffer, state.bet, {
         duration: 1,
-        onUpdate: (latest) => (state.buffer = Math.floor(latest)),
+        onUpdate: (latest) => (state.buffer = state.bet % 1 == 0 ? Math.floor(latest) : latest),
       });
     }
   };
