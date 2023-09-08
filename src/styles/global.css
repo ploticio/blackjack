@@ -22,13 +22,6 @@
   align-items: flex-end;
 }
 
-.hands-display {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 85vh;
-}
-
 .overlay {
   position: fixed;
   width: 100%;
@@ -49,14 +42,18 @@
   opacity: 0;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   .hand img {
-    margin-left: -80px;
-    margin-right: -80px;
+    margin-left: -67px;
+    margin-right: -67px;
     position: relative;
     top: -100vh;
     left: -75vw;
-    width: 200px;
+    width: 170px;
+  }
+
+  .hand-container {
+    gap: 60px;
   }
 
   .chip-container img {
