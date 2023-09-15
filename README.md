@@ -2,7 +2,7 @@
 
 Lose money without actually losing money here.
 
-[Play here!](https://ploticio-blackjack.netlify.app/)
+[Play here!](https://ploticio.github.io/blackjack/)
 ![](https://github.com/ploticio/blackjack/blob/master/demo.gif)
 
 ## Features
